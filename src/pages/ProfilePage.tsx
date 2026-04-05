@@ -87,6 +87,62 @@ export default function ProfilePage() {
     toast.success('Temporal freeze active! Streak protected. ❄️');
   };
 
+  const avatarsGrid = useMemo(() => AVATARS.map((avatar) => (
+    <button
+      key={avatar}
+      onClick={() => selectAvatar(avatar)}
+      className={`aspect-square rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg ${
+        profile?.avatar === avatar
+          ? 'bg-primary text-primary-foreground shadow-primary/30 scale-110 ring-4 ring-primary/20 border-transparent z-10'
+          : 'glass hover:bg-white/20 border-white/10 grayscale-50 opacity-70 hover:opacity-100 hover:grayscale-0 hover:scale-105'
+      }`}
+    >
+      {avatar}
+    </button>
+  )), [profile?.avatar]);
+
+  const personalityGrid = useMemo(() => PERSONALITY_MODES.map((mode) => (
+    <button
+      key={mode.id}
+      onClick={() => selectPersonality(mode.id)}
+      className={`w-full p-4.5 rounded-[1.5rem] text-left flex items-center gap-4 transition-[transform,colors,shadow] duration-300 ease-out border shadow-xl ${
+        profile?.personality_mode === mode.id
+          ? 'bg-primary text-primary-foreground border-transparent z-10 shadow-primary/20'
+          : 'glass border-white/10 hover:border-white/30 hover:bg-white/10'
+      }`}
+      style={{ transform: profile?.personality_mode === mode.id ? 'translate3d(0,0,10px) scale(1.02)' : 'translate3d(0,0,0)' }}
+    >
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner ${
+        profile?.personality_mode === mode.id ? 'bg-white/20 shadow-white/10' : 'bg-white/5 border border-white/5'
+      }`}>
+        {mode.emoji}
+      </div>
+      <div className="flex-1 space-y-0.5">
+        <p className="text-base font-black tracking-tighter drop-shadow-sm">{mode.label}</p>
+        <p className={`text-[11px] font-semibold leading-relaxed ${
+          profile?.personality_mode === mode.id ? 'text-primary-foreground/80' : 'text-foreground/50'
+        }`}>{mode.desc}</p>
+      </div>
+      {profile?.personality_mode === mode.id && <ShieldCheck className="w-6 h-6 text-white/50" />}
+    </button>
+  )), [profile?.personality_mode]);
+
+  const moodsGrid = useMemo(() => MOODS.map((mood) => (
+    <button
+      key={mood.id}
+      onClick={() => selectMood(mood.id)}
+      className={`px-2 py-6 rounded-[1.8rem] text-center transition-[transform,colors,shadow] duration-300 ease-out border shadow-xl ${
+        profile?.mood === mood.id
+          ? 'bg-primary text-primary-foreground border-transparent scale-110 shadow-primary/30 z-10'
+          : 'glass border-white/10 opacity-70 hover:opacity-100 hover:scale-105'
+      }`}
+      style={{ transform: profile?.mood === mood.id ? 'translate3d(0,0,10px) scale(1.1)' : 'translate3d(0,0,0)' }}
+    >
+      <span className="text-4xl block mb-2 drop-shadow-lg">{mood.emoji}</span>
+      <p className="text-[9px] font-black uppercase tracking-tight whitespace-nowrap px-1">{mood.label}</p>
+    </button>
+  )), [profile?.mood]);
+
   if (!user) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center p-6 text-center">
@@ -164,19 +220,7 @@ export default function ProfilePage() {
             <User className="w-4 h-4 text-primary" /> Visual Uplink
           </h3>
           <div className="grid grid-cols-6 gap-3">
-            {useMemo(() => AVATARS.map((avatar) => (
-              <button
-                key={avatar}
-                onClick={() => selectAvatar(avatar)}
-                className={`aspect-square rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg ${
-                  profile?.avatar === avatar
-                    ? 'bg-primary text-primary-foreground shadow-primary/30 scale-110 ring-4 ring-primary/20 border-transparent z-10'
-                    : 'glass hover:bg-white/20 border-white/10 grayscale-50 opacity-70 hover:opacity-100 hover:grayscale-0 hover:scale-105'
-                }`}
-              >
-                {avatar}
-              </button>
-            )), [profile?.avatar])}
+            {avatarsGrid}
           </div>
         </Card>
 
@@ -186,31 +230,7 @@ export default function ProfilePage() {
             <Brain className="w-4.5 h-4.5 text-primary" /> Neural Pattern
           </h3>
           <div className="space-y-3.5">
-            {useMemo(() => PERSONALITY_MODES.map((mode) => (
-              <button
-                key={mode.id}
-                onClick={() => selectPersonality(mode.id)}
-                className={`w-full p-4.5 rounded-[1.5rem] text-left flex items-center gap-4 transition-[transform,colors,shadow] duration-300 ease-out border shadow-xl ${
-                  profile?.personality_mode === mode.id
-                    ? 'bg-primary text-primary-foreground border-transparent z-10 shadow-primary/20'
-                    : 'glass border-white/10 hover:border-white/30 hover:bg-white/10'
-                }`}
-                style={{ transform: profile?.personality_mode === mode.id ? 'translate3d(0,0,10px) scale(1.02)' : 'translate3d(0,0,0)' }}
-              >
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner ${
-                  profile?.personality_mode === mode.id ? 'bg-white/20 shadow-white/10' : 'bg-white/5 border border-white/5'
-                }`}>
-                  {mode.emoji}
-                </div>
-                <div className="flex-1 space-y-0.5">
-                  <p className="text-base font-black tracking-tighter drop-shadow-sm">{mode.label}</p>
-                  <p className={`text-[11px] font-semibold leading-relaxed ${
-                    profile?.personality_mode === mode.id ? 'text-primary-foreground/80' : 'text-foreground/50'
-                  }`}>{mode.desc}</p>
-                </div>
-                {profile?.personality_mode === mode.id && <ShieldCheck className="w-6 h-6 text-white/50" />}
-              </button>
-            )), [profile?.personality_mode])}
+            {personalityGrid}
           </div>
         </Card>
 
@@ -220,21 +240,7 @@ export default function ProfilePage() {
             <Smile className="w-4.5 h-4.5 text-primary" /> Core Vitality
           </h3>
           <div className="grid grid-cols-3 gap-3.5">
-            {useMemo(() => MOODS.map((mood) => (
-              <button
-                key={mood.id}
-                onClick={() => selectMood(mood.id)}
-                className={`px-2 py-6 rounded-[1.8rem] text-center transition-[transform,colors,shadow] duration-300 ease-out border shadow-xl ${
-                  profile?.mood === mood.id
-                    ? 'bg-primary text-primary-foreground border-transparent scale-110 shadow-primary/30 z-10'
-                    : 'glass border-white/10 opacity-70 hover:opacity-100 hover:scale-105'
-                }`}
-                style={{ transform: profile?.mood === mood.id ? 'translate3d(0,0,10px) scale(1.1)' : 'translate3d(0,0,0)' }}
-              >
-                <span className="text-4xl block mb-2 drop-shadow-lg">{mood.emoji}</span>
-                <p className="text-[9px] font-black uppercase tracking-tight whitespace-nowrap px-1">{mood.label}</p>
-              </button>
-            )), [profile?.mood])}
+            {moodsGrid}
           </div>
         </Card>
 
