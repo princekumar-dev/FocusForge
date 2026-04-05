@@ -225,7 +225,7 @@ export default function TasksPage() {
   const priorityBadge = (p: string) => {
     switch (p) {
       case 'high':
-        return <Badge variant="destructive" className="glass text-[10px] uppercase font-black tracking-widest border-red-500/30">High</Badge>;
+        return <Badge className="bg-red-500/90 hover:bg-red-500 text-white text-[10px] uppercase font-black tracking-widest border border-red-400/30 shadow-lg shadow-red-500/20">High</Badge>;
       case 'medium':
         return <Badge variant="secondary" className="glass text-[10px] uppercase font-black tracking-widest border-white/10">Med</Badge>;
       default:
