@@ -210,12 +210,12 @@ export default function DashboardPage() {
             <span className="text-xs font-black uppercase tracking-widest text-foreground/70 drop-shadow-sm">{xp} / {xpNeeded} XP</span>
           </div>
           <div className="relative h-5 bg-white/10 rounded-full border border-white/5 mt-1">
-            <div 
+            <div
               className="absolute inset-y-0 left-0 bg-primary transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]"
               style={{ transform: `translate3d(0, 0, 0)`, width: `${xpPercent}%` }}
             />
             {/* Avatar Caret */}
-            <div 
+            <div
               className="absolute top-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10"
               style={{ left: `${xpPercent}%`, transform: `translate3d(-50%, -50%, 0)` }}
               onClick={() => playAvatarSound(profile?.avatar || '🌱')}
@@ -275,12 +275,12 @@ export default function DashboardPage() {
             <span className="text-xs font-black text-foreground/80 tracking-widest uppercase">{energy}/{maxEnergy}</span>
           </div>
           <div className="relative h-5 bg-white/10 rounded-full border border-white/5 mt-1">
-            <div 
+            <div
               className="absolute inset-y-0 left-0 bg-yellow-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(234,179,8,0.3)]"
               style={{ transform: `translate3d(0, 0, 0)`, width: `${energyPercent}%` }}
             />
             {/* Avatar Caret */}
-            <div 
+            <div
               className="absolute top-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10"
               style={{ left: `${energyPercent}%`, transform: `translate3d(-50%, -50%, 0)` }}
               onClick={() => playAvatarSound(profile?.avatar || '🌱')}
@@ -357,7 +357,7 @@ export default function DashboardPage() {
                   onClick={() => completeTask(task)}
                   className="w-10 h-10 rounded-2xl border-2 border-white/20 flex-shrink-0 hover:bg-primary/20 hover:border-primary transition-all flex items-center justify-center group/btn active:scale-90"
                 >
-                  <span className="opacity-0 group-hover/btn:opacity-100 text-primary text-xl font-bold">✓</span>
+                  <span className="opacity-100 md:opacity-0 md:group-hover/btn:opacity-100 text-primary text-xl font-bold">✓</span>
                 </button>
                 <div className="flex-1 min-w-0 space-y-1">
                   <p className="text-lg font-black truncate tracking-tighter text-foreground drop-shadow-sm">{task.title}</p>

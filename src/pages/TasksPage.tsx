@@ -326,11 +326,17 @@ export default function TasksPage() {
               onTouchEnd={() => handleTouchEnd(task)}
             >
               <div className="absolute inset-0 flex items-center justify-between px-6 bg-primary/5">
-                <div className="flex items-center gap-2 text-primary font-black uppercase text-[10px] tracking-widest">
+                <div 
+                  className="flex items-center gap-2 text-primary font-black uppercase text-[10px] tracking-widest transition-opacity"
+                  style={{ opacity: swipeId === task.id && swipeX > 0 ? Math.min(1, swipeX / 50) : 0 }}
+                >
                   <Check className="w-5 h-5" />
                   <span>Complete</span>
                 </div>
-                <div className="flex items-center gap-2 text-destructive font-black uppercase text-[10px] tracking-widest">
+                <div 
+                  className="flex items-center gap-2 text-destructive font-black uppercase text-[10px] tracking-widest transition-opacity"
+                  style={{ opacity: swipeId === task.id && swipeX < 0 ? Math.min(1, Math.abs(swipeX) / 50) : 0 }}
+                >
                   <span>Delete</span>
                   <Trash2 className="w-5 h-5" />
                 </div>
@@ -345,9 +351,9 @@ export default function TasksPage() {
                   onClick={(e) => { e.stopPropagation(); void completeTask(task); }}
                   className="w-10 h-10 rounded-2xl border-2 border-white/20 flex-shrink-0 hover:bg-primary/20 hover:border-primary transition-all flex items-center justify-center group/btn active:scale-95"
                 >
-                  <Check className="w-5 h-5 opacity-0 group-hover/btn:opacity-100 text-primary transition-opacity" />
+                  <Check className="w-5 h-5 opacity-100 md:opacity-0 md:group-hover/btn:opacity-100 text-primary transition-opacity" />
                 </button>
-                
+
                 <div className="flex-1 min-w-0 space-y-1.5">
                   <p className="text-base font-bold truncate tracking-tight text-foreground drop-shadow-sm">{task.title}</p>
                   <div className="flex items-center gap-3">
@@ -361,7 +367,7 @@ export default function TasksPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={(e) => { e.stopPropagation(); void deleteTask(task.id); }}
                     className="p-2 rounded-xl hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
