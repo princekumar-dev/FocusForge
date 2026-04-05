@@ -1,0 +1,34 @@
+
+> focusforge@ dev C:\Users\princ\Downloads\New folder\frontend
+> vite
+
+Port 3000 is in use, trying another one...
+Port 3001 is in use, trying another one...
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m2454[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3002[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [3[2m1:25:45 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m1:25:55 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/BottomNav.tsx, /src/index.css[22m
+[2m1:30:16 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Index.tsx, /src/index.css[22m
+[2m1:32:10 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m1:32:24 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Index.tsx, /src/index.css[22m
+[2m1:32:43 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m1:32:54 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Index.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/FocusPage.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/components/ui/toast.tsx[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ProfilePage.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LogoutCallbackPage.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/Index.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/SignInPage.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AuthError.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/SignUpPage.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/components/ProtectedAdminRoute.tsx[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AuthCallback.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/TasksPage.tsx, /src/index.css[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/components/LoadingSpinner.tsx[22m
+[2m1:33:32 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/StatsPage.tsx, /src/index.css[22m
+[2m1:33:48 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m1:34:26 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m1:34:38 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m1:36:27 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m

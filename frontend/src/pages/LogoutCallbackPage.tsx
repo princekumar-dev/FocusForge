@@ -11,7 +11,7 @@ const LogoutCallbackPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
           <svg

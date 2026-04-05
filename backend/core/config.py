@@ -1,10 +1,18 @@
 import logging
 import os
 from typing import Any
+from pathlib import Path
+from dotenv import load_dotenv
 
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
+
+# Load environment variables from workspace root `.env` so local runs pick them up
+# `parents[2]` moves up from backend/core -> backend -> workspace root
+env_path = Path(__file__).parents[2] / ".env"
+if env_path.exists():
+    load_dotenv(env_path, override=False)
 
 
 class Settings(BaseSettings):
@@ -62,6 +70,9 @@ eQIDAQAB
     class Config:
         case_sensitive = False
         extra = "ignore"
+        # Ensure pydantic reads the workspace .env file for local development
+        env_file = str(Path(__file__).parents[2] / ".env")
+        env_file_encoding = "utf-8"
 
     def __getattr__(self, name: str) -> Any:
         """

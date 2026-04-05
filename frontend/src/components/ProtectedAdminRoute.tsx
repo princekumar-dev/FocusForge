@@ -18,7 +18,7 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[100dvh] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Verifying permissions...</p>
@@ -35,7 +35,7 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
   // If the user is not an admin, show an insufficient-permissions page
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-gray-50">
         <Card className="w-full max-w-md mx-4">
           <CardHeader className="text-center">
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">

@@ -235,7 +235,7 @@ export default function TasksPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 text-center">
+      <div className="min-h-[100dvh] flex items-center justify-center p-6 text-center">
         <div className="max-w-sm space-y-6 glass p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
           <div className="space-y-3 relative z-10">
             <h1 className="text-5xl font-black tracking-tighter text-foreground drop-shadow-md">FocusForge</h1>
@@ -251,7 +251,7 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="min-h-screen pb-safe">
+    <div className="min-h-[100dvh] pb-safe">
       {showConfetti && <ConfettiEffect />}
 
       <div className="px-4 pt-8 pb-4 max-w-lg mx-auto">

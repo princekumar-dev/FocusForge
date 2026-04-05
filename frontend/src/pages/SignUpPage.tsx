@@ -3,7 +3,7 @@ import { Target } from 'lucide-react';
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 relative overflow-hidden">
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
         <Target className="w-[80vw] h-[80vw] text-primary" />
       </div>

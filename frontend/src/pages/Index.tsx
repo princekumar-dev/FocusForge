@@ -108,7 +108,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-4 pb-safe flex items-center justify-center">
+      <div className="min-h-[100dvh] p-4 pb-safe flex items-center justify-center">
         <div className="max-w-lg w-full space-y-4">
           <Skeleton className="h-8 w-48 bg-white/20" />
           <Skeleton className="h-32 w-full rounded-2xl bg-white/10" />
@@ -121,11 +121,11 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center">
         <div className="max-w-sm space-y-8 glass p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
-          <div className="w-40 h-40 mx-auto rounded-full overflow-hidden bg-white/20 backdrop-blur-md shadow-2xl p-2 border border-white/30 relative z-10 transition-transform duration-500 group-hover:scale-105">
-            <img src={TREE_IMAGES[0]} alt="FocusForge" className="w-full h-full object-cover rounded-full" />
+          <div className="w-40 h-40 mx-auto rounded-full overflow-hidden bg-white/20 shadow-2xl p-2 border border-white/30 relative z-10 transition-transform duration-500 group-hover:scale-105">
+            <img src={TREE_IMAGES[0]} alt="FocusForge" className="w-full h-full object-cover rounded-full" loading="lazy" decoding="async" />
           </div>
           <div className="space-y-4 relative z-10">
             <h1 className="text-5xl font-extrabold tracking-tight text-foreground drop-shadow-sm">FocusForge</h1>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen pb-safe">
+    <div className="min-h-[100dvh] pb-safe">
       {showConfetti && <ConfettiEffect />}
 
       {/* Header */}
@@ -235,21 +235,21 @@ export default function DashboardPage() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-4">
-          <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-all hover:scale-[1.02]">
+          <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-transform hover:scale-[1.02]">
             <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-orange-500/10 flex items-center justify-center">
               <Flame className="w-4 h-4 text-orange-500" />
             </div>
             <p className="text-2xl font-black">{streak}</p>
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Streak</p>
           </Card>
-          <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-all hover:scale-[1.02]">
+          <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-transform hover:scale-[1.02]">
             <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-yellow-500/10 flex items-center justify-center">
               <Zap className="w-4 h-4 text-yellow-500" />
             </div>
             <p className="text-2xl font-black">{energy}</p>
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Energy</p>
           </Card>
-          <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-all hover:scale-[1.02]">
+          <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-transform hover:scale-[1.02]">
             <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-blue-500/10 flex items-center justify-center">
               <Target className="w-4 h-4 text-blue-500" />
             </div>
@@ -294,6 +294,8 @@ export default function DashboardPage() {
               <img
                 src={TREE_IMAGES[treeStage - 1]}
                 alt={`Tree stage ${treeStage}`}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover rounded-[1.2rem] transition-transform duration-700 group-hover:scale-110"
               />
             </div>
@@ -342,7 +344,7 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-3">
             {todayTasks.map((task) => (
-              <Card key={task.id} className="glass p-4 rounded-[1.5rem] border-white/10 flex items-center gap-4 group hover:border-white/30 transition-all hover:translate-x-1">
+              <Card key={task.id} className="glass p-4 rounded-[1.5rem] border-white/10 flex items-center gap-4 group hover:border-white/30 transition-transform hover:translate-x-1">
                 <button
                   onClick={() => completeTask(task)}
                   className="w-10 h-10 rounded-2xl border-2 border-white/20 flex-shrink-0 hover:bg-primary/20 hover:border-primary transition-all flex items-center justify-center group/btn active:scale-90"
@@ -372,7 +374,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-4 pt-2">
           <Button
             variant="outline"
-            className="glass h-auto py-5 flex flex-col items-center gap-2 rounded-[2rem] border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group"
+            className="glass h-auto py-5 flex flex-col items-center gap-2 rounded-[2rem] border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors group"
             onClick={() => navigate('/focus')}
           >
             <div className="p-3 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -382,7 +384,7 @@ export default function DashboardPage() {
           </Button>
           <Button
             variant="outline"
-            className="glass h-auto py-5 flex flex-col items-center gap-2 rounded-[2rem] border-white/10 hover:border-white/30 hover:bg-white/5 transition-all group"
+            className="glass h-auto py-5 flex flex-col items-center gap-2 rounded-[2rem] border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors group"
             onClick={() => navigate('/stats')}
           >
             <div className="p-3 rounded-2xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">

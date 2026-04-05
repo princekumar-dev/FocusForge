@@ -1,0 +1,40 @@
+^C2m12:58:40 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m12:58:41 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m12:59:55 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m12:59:55 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m12:59:55 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m1:00:49 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m1:01:42 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m1:02:56 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m1:10:49 PM[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/config[39m
+AggregateError [ENOBUFS]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at internalConnectMultiple (node:net:1210:5)
+    at internalConnectMultiple (node:net:1210:5)
+    at defaultTriggerAsyncIdScope (node:internal/async_hooks:472:18)
+    at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1552:7)
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:134:8)
