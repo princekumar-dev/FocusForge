@@ -1,0 +1,83 @@
+{
+    "title": "user_profiles",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID"
+        },
+        "display_name": {
+            "type": "string",
+            "description": "Display name"
+        },
+        "avatar": {
+            "type": "string",
+            "description": "Avatar identifier"
+        },
+        "level": {
+            "type": "integer",
+            "description": "Current level"
+        },
+        "xp": {
+            "type": "integer",
+            "description": "Current XP in level"
+        },
+        "total_xp": {
+            "type": "integer",
+            "description": "Total XP earned"
+        },
+        "energy": {
+            "type": "integer",
+            "description": "Current energy"
+        },
+        "max_energy": {
+            "type": "integer",
+            "description": "Maximum energy"
+        },
+        "streak": {
+            "type": "integer",
+            "description": "Current streak days"
+        },
+        "best_streak": {
+            "type": "integer",
+            "description": "Best streak record"
+        },
+        "streak_freezes": {
+            "type": "integer",
+            "description": "Available streak freezes"
+        },
+        "personality_mode": {
+            "type": "string",
+            "description": "AI personality: chill, strict, funny"
+        },
+        "mood": {
+            "type": "string",
+            "description": "Current mood: lazy, productive, overwhelmed"
+        },
+        "tree_stage": {
+            "type": "integer",
+            "description": "Virtual tree growth stage 1-4"
+        },
+        "tasks_completed": {
+            "type": "integer",
+            "description": "Total tasks completed"
+        },
+        "focus_minutes": {
+            "type": "integer",
+            "description": "Total focus minutes"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id"
+    ]
+}
