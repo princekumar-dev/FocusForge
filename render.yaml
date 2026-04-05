@@ -11,5 +11,5 @@ services:
   - name: frontend
     type: static
     env: static
-    buildCommand: "cd frontend && npm install -g pnpm@10.27.0 && pnpm install && pnpm run build"
-    publishPath: frontend/dist
+    buildCommand: "corepack enable && corepack prepare pnpm@10.27.0 --activate && pnpm install && pnpm run build"
+    publishPath: dist
