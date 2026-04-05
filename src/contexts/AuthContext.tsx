@@ -87,6 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Ref to track whether a token exchange is already in progress to avoid races.
   const exchangeInProgress = useRef(false);
+  // Guard against concurrent fetchProfile calls that could create duplicate profiles.
+  const profileFetchInProgress = useRef(false);
   // Ref for the periodic refresh timer so we can clean it up.
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -148,6 +150,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Prevent concurrent profile fetches — this is what caused duplicate profiles
+    // when multiple effects or re-renders triggered fetchProfile simultaneously.
+    if (profileFetchInProgress.current) return;
+    profileFetchInProgress.current = true;
+
     setProfileLoading(true);
     try {
       const res = await client.entities.user_profiles.query({
@@ -156,10 +163,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       const items = res?.data?.items;
       if (items && items.length > 0) {
-        setProfile(items[0] as UserProfile);
+        const existing = items[0] as UserProfile;
+
+        // Auto-fix "Adventurer" display name if Clerk now has the real name.
+        // This handles the case where a profile was previously created before
+        // Clerk had the user's real name available.
+        const realName = clerkUser.firstName ?? clerkUser.fullName ?? clerkUser.username;
+        if (existing.display_name === DEFAULT_PROFILE.display_name && realName) {
+          try {
+            const updateRes = await client.entities.user_profiles.update({
+              id: String(existing.id),
+              data: { display_name: realName },
+            });
+            if (updateRes?.data) {
+              setProfile(updateRes.data as UserProfile);
+              return;
+            }
+          } catch {
+            // Name update failed — use profile as-is, don't block login.
+          }
+        }
+
+        setProfile(existing);
         return;
       }
 
+      // No profile found — create a new one.
+      // We only reach here if the query SUCCEEDED with 0 results (not errored).
+      // This ensures we never create a duplicate when the query just failed.
       const createRes = await client.entities.user_profiles.create({
         data: {
           ...DEFAULT_PROFILE,
@@ -176,9 +207,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(createRes.data as UserProfile);
       }
     } catch (err) {
+      // Query itself failed (401, network error, etc.)
+      // Do NOT create a profile here — we can't tell if one already exists.
       console.error('[Auth] Failed to fetch profile:', err);
     } finally {
       setProfileLoading(false);
+      profileFetchInProgress.current = false;
     }
   }, [clerkUser]);
 
@@ -226,20 +260,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Token is missing, stale, or for a different user — exchange silently.
+    // Token is missing, stale, or for a different user — exchange with retries.
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    let cancelled = false;
+
     const initExchange = async () => {
+      if (cancelled) return;
       const ok = await doTokenExchange();
       if (ok) {
         setBackendReady(true);
+      } else if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        const delay = retryCount * 2000; // 2s, 4s, 6s
+        console.warn(`[Auth] Token exchange attempt ${retryCount}/${MAX_RETRIES} failed — retrying in ${delay / 1000}s`);
+        setTimeout(initExchange, delay);
       } else {
-        // Even if the exchange fails, mark backend as ready so the UI
-        // doesn't hang forever. The periodic refresh will retry shortly.
-        console.warn('[Auth] Initial token exchange failed — will retry');
+        // All retries exhausted. Let the UI render so it's not stuck forever.
+        console.error('[Auth] All token exchange attempts failed');
         setBackendReady(true);
       }
     };
 
     void initExchange();
+
+    return () => { cancelled = true; };
   }, [clerkUser, doTokenExchange, isLoaded, isSignedIn]);
 
   // ─── Periodic token refresh ───────────────────────────────────────────
