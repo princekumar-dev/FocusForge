@@ -10,6 +10,7 @@ import BottomNav from '@/components/BottomNav';
 import { LogOut, User, Smile, Brain, Snowflake, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAvatarSound } from '@/hooks/useAvatarSound';
+import { useTheme } from 'next-themes';
 
 
 const AVATARS = ['🌱', '🌿', '🌳', '✨', '🔥', '⚡', '🎯', '🏆', '🦊', '🐱', '🐼', '👻'];
@@ -32,9 +33,8 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState(false);
 
   const [nameValue, setNameValue] = useState(profile?.display_name || '');
-  const [darkMode, setDarkMode] = useState(
-    document.documentElement.classList.contains('dark')
-  );
+  const { theme, setTheme } = useTheme();
+  const darkMode = theme === 'dark';
   const experience = useMemo(() => getProfileExperience(profile), [profile]);
 
   useEffect(() => {
@@ -42,12 +42,8 @@ export default function ProfilePage() {
   }, [profile?.display_name]);
 
   const toggleDarkMode = (checked: boolean) => {
-    setDarkMode(checked);
-    if (checked) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    setTheme(checked ? 'dark' : 'light');
+    toast.success(`${checked ? 'Dark' : 'Light'} mode active`);
   };
 
   const saveName = async () => {
