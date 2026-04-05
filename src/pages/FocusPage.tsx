@@ -176,20 +176,20 @@ export default function FocusPage() {
           <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
             <Target className="w-64 h-64 text-primary" />
           </div>
-          
+
           <div className="relative w-72 h-72 group transition-transform duration-500 hover:scale-[1.02]">
             <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_40px_rgba(0,0,0,0.15)]" viewBox="0 0 260 260">
               {/* Refined Track - Light Grey Base */}
-              <circle 
-                cx="130" 
-                cy="130" 
-                r="120" 
-                fill="none" 
-                stroke="#EEEEEE" 
-                strokeWidth="20" 
-                className="opacity-100" 
+              <circle
+                cx="130"
+                cy="130"
+                r="120"
+                fill="none"
+                stroke="#EEEEEE"
+                strokeWidth="20"
+                className="opacity-100"
               />
-              
+
               {/* Smooth Black Progress Bar - Fills as time elapses */}
               <circle
                 cx="130"
@@ -246,11 +246,10 @@ export default function FocusPage() {
                   key={preset.value}
                   variant="ghost"
                   size="sm"
-                  className={`h-11 rounded-xl font-bold transition-all border border-transparent ${
-                    duration === preset.value 
-                      ? 'bg-primary/10 border-primary/30 text-primary' 
-                      : 'hover:bg-white/5 text-muted-foreground font-semibold'
-                  }`}
+                  className={`h-11 rounded-xl font-bold transition-all border border-transparent ${duration === preset.value
+                    ? 'bg-primary/10 border-primary/30 text-primary'
+                    : 'hover:bg-white/5 text-muted-foreground font-semibold'
+                    }`}
                   onClick={() => changeDuration(String(preset.value))}
                   disabled={isRunning}
                 >
@@ -291,7 +290,7 @@ export default function FocusPage() {
               </label>
               <Switch checked={ambientSound} onCheckedChange={setAmbientSound} className="data-[state=checked]:bg-primary" />
             </div>
-            
+
             <Select value={ambientPreset} onValueChange={(value) => setAmbientPreset(value as AmbientPreset)}>
               <SelectTrigger className="glass rounded-xl h-12 border-white/20 font-bold text-sm">
                 <SelectValue placeholder="Ambient texture" />
@@ -302,7 +301,7 @@ export default function FocusPage() {
                 <SelectItem value="focus" className="font-medium">Deep Focus</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <p className="text-[11px] text-foreground/50 font-semibold mt-3 ml-1 text-shadow-sm">
               {ambientSound
                 ? `${getAmbientPresetLabel(ambientPreset)} is active while work is in progress.`
@@ -320,6 +319,8 @@ export default function FocusPage() {
               <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 mt-1">Total Mins</p>
             </Card>
           </div>
+
+          <div className="h-2" aria-hidden="true" />
         </div>
       </div>
 
