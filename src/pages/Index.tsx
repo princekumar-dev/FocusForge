@@ -177,7 +177,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground/60 flex items-center gap-2 drop-shadow-sm">
-              Good {getGreeting()} <span className="text-base">👋</span>
+              Good {getGreeting(now)} <span className="text-base">👋</span>
             </p>
             <h1 className="text-5xl font-black text-foreground tracking-tighter drop-shadow-sm">{profile?.display_name || 'Adventurer'}</h1>
             <p className="text-sm text-foreground/70 font-semibold leading-relaxed max-w-[20rem] text-shadow-sm">{experience.dashboardGreeting}</p>
