@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import type { UserProfile } from '@/contexts/AuthContext';
 
 type MoodKey = 'lazy' | 'productive' | 'overwhelmed';
@@ -75,12 +77,49 @@ import { generateDynamicQuote } from './quotesLibrary';
 
 export type QuoteCategory = 'dashboard' | 'tasks' | 'focus';
 
-function getTimeOfDay(): TimeOfDay {
-  const hour = new Date().getHours();
+export function getTimeOfDay(now = new Date()): TimeOfDay {
+  const hour = now.getHours();
   if (hour >= 5 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 18) return 'afternoon';
-  if (hour >= 18 && hour < 22) return 'evening';
+  if (hour >= 12 && hour < 17) return 'afternoon';
+  if (hour >= 17 && hour < 22) return 'evening';
   return 'night';
+}
+
+export function getTimeGreeting(now = new Date()): string {
+  const timeOfDay = getTimeOfDay(now);
+  if (timeOfDay === 'night') return 'night';
+  return timeOfDay;
+}
+
+function getMillisecondsUntilNextMinute(now = new Date()): number {
+  const nextMinute = new Date(now);
+  nextMinute.setSeconds(60, 0);
+  return Math.max(1000, nextMinute.getTime() - now.getTime());
+}
+
+export function useQuoteClock() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const schedule = () => {
+      timeoutId = setTimeout(() => {
+        setNow(new Date());
+        schedule();
+      }, getMillisecondsUntilNextMinute());
+    };
+
+    schedule();
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []);
+
+  return now;
 }
 
 export function getMoodConfig(mood?: string) {
@@ -100,16 +139,16 @@ export function getAmbientPresetLabel(preset: AmbientPreset) {
   return 'Deep Focus';
 }
 
-export function getProfileExperience(profile: UserProfile | null) {
+export function getProfileExperience(profile: UserProfile | null, now = new Date()) {
   const moodKey = (profile?.mood as MoodKey) || 'productive';
   const mood = getMoodConfig(moodKey);
   const personalityKey = (profile?.personality_mode as PersonalityKey) || 'chill';
   const personality = getPersonalityConfig(personalityKey);
-  const timeOfDay = getTimeOfDay();
+  const timeOfDay = getTimeOfDay(now);
 
-  const dashboardQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'dashboard');
-  const taskQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'tasks');
-  const focusQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'focus');
+  const dashboardQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'dashboard', now);
+  const taskQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'tasks', now);
+  const focusQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'focus', now);
 
   return {
     mood,

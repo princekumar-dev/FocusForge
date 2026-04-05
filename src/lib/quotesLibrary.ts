@@ -91,9 +91,10 @@ export function generateDynamicQuote(
   personality: PersonalityKey,
   mood: MoodKey,
   timeOfDay: TimeOfDay,
-  category: QuoteCategory
+  category: QuoteCategory,
+  now = new Date()
 ): string {
-  const seedPrefix = new Date().toDateString() + new Date().getHours() + '';
+  const seedPrefix = `${now.toDateString()}-${now.getHours()}`;
   
   const greetingsList = GREETINGS[personality]?.[timeOfDay] || GREETINGS.chill.morning;
   const greeting = getStableRandomElement(greetingsList, seedPrefix + category + 'greeting');
