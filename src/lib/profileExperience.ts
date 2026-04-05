@@ -77,9 +77,28 @@ import { generateDynamicQuote } from './quotesLibrary';
 
 export type QuoteCategory = 'dashboard' | 'tasks' | 'focus';
 
+function getLocalHour(now = new Date()): number {
+  try {
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      hourCycle: 'h23',
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+    const hourPart = formatter.formatToParts(now).find((part) => part.type === 'hour')?.value;
+    const hour = Number(hourPart);
+    if (!Number.isNaN(hour)) {
+      return hour;
+    }
+  } catch {
+    // Fall back to the runtime local clock below.
+  }
+
+  return now.getHours();
+}
+
 export function getTimeOfDay(now = new Date()): TimeOfDay {
-  const hour = now.getHours();
-  if (hour >= 5 && hour < 12) return 'morning';
+  const hour = getLocalHour(now);
+  if (hour >= 0 && hour < 12) return 'morning';
   if (hour >= 12 && hour < 17) return 'afternoon';
   if (hour >= 17 && hour < 22) return 'evening';
   return 'night';
