@@ -231,7 +231,7 @@ export default function DashboardPage() {
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">
                 {experience.personality.label} • {experience.mood.label}
               </p>
-              <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.taskCoaching}</p>
+              <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.homePulse}</p>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile')} className="rounded-xl border-white/20 hover:bg-white/10 transition-all font-bold text-[10px] uppercase tracking-wider">
               Tune vibe
