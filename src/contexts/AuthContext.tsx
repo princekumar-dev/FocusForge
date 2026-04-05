@@ -269,7 +269,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       const ok = await doTokenExchange();
       if (ok) {
-        setBackendReady(true);
+        // The @metagptx/web-sdk client was created (via createClient()) before
+        // the token existed in localStorage. It won't pick up the new token
+        // dynamically — a page reload is required so the SDK re-initializes
+        // with the fresh token. This ONLY happens on first login; subsequent
+        // page loads will find the token in localStorage at line 258 and skip
+        // this branch entirely (no infinite reload loop).
+        window.location.reload();
       } else if (retryCount < MAX_RETRIES) {
         retryCount++;
         const delay = retryCount * 2000; // 2s, 4s, 6s
