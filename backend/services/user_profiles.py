@@ -16,11 +16,21 @@ class User_profilesService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def get_latest_by_user_id(self, user_id: str) -> Optional[User_profiles]:
+        """Return the most recent profile for a user."""
+        result = await self.db.execute(
+            select(User_profiles).where(User_profiles.user_id == user_id).order_by(User_profiles.id.desc()).limit(1)
+        )
+        return result.scalar_one_or_none()
+
     async def create(self, data: Dict[str, Any], user_id: Optional[str] = None) -> Optional[User_profiles]:
         """Create a new user_profiles"""
         try:
             if user_id:
                 data['user_id'] = user_id
+                existing = await self.get_latest_by_user_id(user_id)
+                if existing:
+                    return existing
             obj = User_profiles(**data)
             self.db.add(obj)
             await self.db.commit()
