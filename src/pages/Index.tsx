@@ -89,9 +89,9 @@ export default function DashboardPage() {
         data: { status: 'completed', completed_at: new Date().toISOString() },
       });
 
-      const newXp = (profile.xp || 0) + (task.xp_reward || 10);
-      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward || 10);
-      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost || 10));
+      const newXp = (profile.xp || 0) + (task.xp_reward ?? 10);
+      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward ?? 10);
+      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost ?? 10));
       const newTasksCompleted = (profile.tasks_completed || 0) + 1;
       const xpNeeded = xpForLevel(profile.level || 1);
       let newLevel = profile.level || 1;
