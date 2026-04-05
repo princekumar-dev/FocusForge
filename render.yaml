@@ -3,9 +3,12 @@ services:
     type: web
     env: docker
     dockerfilePath: backend/Dockerfile
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.5
 
   - name: frontend
     type: static
     env: static
-    buildCommand: "cd frontend && corepack enable && corepack prepare pnpm@8.10.0 --activate && pnpm install && pnpm run build"
+    buildCommand: "cd frontend && npm install -g pnpm@10.27.0 && pnpm install && pnpm run build"
     publishPath: frontend/dist
