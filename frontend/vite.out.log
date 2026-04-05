@@ -34,3 +34,4 @@ Port 3001 is in use, trying another one...
 [2m1:36:27 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
 [2m2:47:57 PM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
 [2m2:47:57 PM[22m [36m[1m[vite][22m[39m server restarted.
+ ELIFECYCLE  Command failed with exit code 3221225786.

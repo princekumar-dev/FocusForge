@@ -1,0 +1,6 @@
+backend/
+node_modules/
+.venv/
+.mgx/
+*.db
+*.log

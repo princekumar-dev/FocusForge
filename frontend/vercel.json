@@ -1,0 +1,8 @@
+{
+  "installCommand": "npm install -g pnpm@10.27.0 && pnpm install",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/((?!assets/|.*\\.).*)", "destination": "/index.html" }
+  ]
+}

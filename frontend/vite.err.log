@@ -38,3 +38,4 @@ AggregateError [ENOBUFS]:
     at defaultTriggerAsyncIdScope (node:internal/async_hooks:472:18)
     at GetAddrInfoReqWrap.emitLookup [as callback] (node:net:1552:7)
     at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:134:8)
+^C
