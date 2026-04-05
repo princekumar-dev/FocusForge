@@ -1,6 +1,4 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@10.27.0 --activate && pnpm install",
-  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/((?!assets/|.*\\.).*)", "destination": "/index.html" }
