@@ -1,81 +1,270 @@
 type MoodKey = 'lazy' | 'productive' | 'overwhelmed';
 type PersonalityKey = 'chill' | 'strict' | 'funny';
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
-type QuoteCategory = 'dashboard' | 'tasks' | 'focus';
+type QuoteCategory = 'dashboard' | 'tasks' | 'focus' | 'stats';
 
 const GREETINGS: Record<PersonalityKey, Record<TimeOfDay, string[]>> = {
   chill: {
-    morning: ['Morning friend.', 'Rise and easily shine.', 'A new dawn.', 'Easy morning.'],
-    afternoon: ['Good afternoon.', 'Hope the day is flowing well.', 'Mid-day check-in.', 'Afternoon vibes.'],
-    evening: ['Evening is here.', 'The day is winding down.', 'Almost sunset.', 'Relaxing evening.'],
-    night: ['Late night?', 'The world is quiet.', 'Peaceful night.', 'Nighttime calm.']
+    morning: ['Morning friend.', 'Easy morning.', 'Fresh start energy.', 'A calm new day.'],
+    afternoon: ['Good afternoon.', 'Afternoon vibes.', 'Midday check-in.', 'The day is still yours.'],
+    evening: ['Evening is here.', 'Soft landing time.', 'A slower hour has arrived.', 'Settle into the evening.'],
+    night: ['Late night?', 'The world is quiet.', 'Peaceful night.', 'A quiet hour is here.'],
   },
   strict: {
-    morning: ['Get up.', 'Morning is for execution.', 'The day has begun.', 'Start moving.'],
-    afternoon: ['Half the day is gone.', 'Keep up the pace.', 'Afternoon check.', 'No slacking.'],
-    evening: ['The sun is setting.', 'Evening means finish, not stop.', 'Final push.', 'Keep working.'],
-    night: ['Still awake?', 'Night is for the dedicated.', 'No sleep till done.', 'Focus absolute.']
+    morning: ['Get up.', 'Day start. No excuses.', 'Morning is for execution.', 'Start moving.'],
+    afternoon: ['Maintain output.', 'Half the day is gone.', 'Afternoon check.', 'Keep the pace.'],
+    evening: ['Close strong.', 'Final push.', 'Evening means finish, not stop.', 'Keep working.'],
+    night: ['Still awake?', 'Late hour. Stay sharp.', 'Night is for the dedicated.', 'Focus absolute.'],
   },
   funny: {
-    morning: ['Morning! Brain buffering...', 'Rise and pretend to shine.', 'Coffee time.', 'We exist again.'],
-    afternoon: ['Afternoon panic check.', 'Still here?', 'Surviving the day?', 'Caffeine wearing off?'],
-    evening: ['Evening doomscroll incoming?', 'Sun is gone, you are still here.', 'Almost done.', 'Fake it till you sleep.'],
-    night: ['2 AM vibes.', 'Go to sleep.', 'Night owl mode activated.', 'Why are we awake?']
-  }
+    morning: ['Morning. Systems online.', 'We exist again.', 'Coffee time.', 'Operating system loaded. Barely.'],
+    afternoon: ['Afternoon panic check.', 'Still here?', 'Midday chaos report?', 'Caffeine wearing off?'],
+    evening: ['Evening arc unlocked.', 'Almost done.', 'We made it this far somehow.', 'Fake it till bedtime.'],
+    night: ['Night owl mode activated.', 'Why are we awake?', 'This feels medically late.', '2 AM vibes.'],
+  },
 };
 
 const ADVICE: Record<PersonalityKey, Record<MoodKey, Record<QuoteCategory, string[]>>> = {
   chill: {
     lazy: {
-      dashboard: ['Let’s just take it slow today.', 'Don’t push too hard.', 'Take it easy.'],
-      tasks: ['Pick the easiest mission.', 'Small steps are fine.', 'No rush on these.'],
-      focus: ['A gentle focus session ahead.', 'Just breathe and do a little.', 'Ease into it.']
+      dashboard: [
+        'Keep the bar low and kind today.',
+        'Take it easy and protect your energy.',
+        'Today can be gentle and still count.',
+        'A soft pace is still forward motion.',
+      ],
+      tasks: [
+        'Choose the least intimidating mission first.',
+        'One tiny win is enough to begin.',
+        'Small steps are perfectly valid here.',
+        'Pick the easiest task and let momentum grow.',
+      ],
+      focus: [
+        'Keep this focus session soft and simple.',
+        'A little attention still counts.',
+        'Ease into the work instead of forcing it.',
+        'Gentle concentration is enough for now.',
+      ],
+      stats: [
+        'Your progress still matters on slower days.',
+        'Small wins stack up more than they seem.',
+        'The numbers still tell a real story.',
+        'Even a gentle pace leaves footprints behind.',
+      ],
     },
     productive: {
-      dashboard: ['You have great energy today.', 'Ride the wave smoothly.', 'Smooth sailing today.'],
-      tasks: ['Let’s clear these missions effortlessly.', 'Flow through your list.', 'Steady progress.'],
-      focus: ['Deep, flowing focus.', 'You have the energy, use it well.', 'Find your rhythm.']
+      dashboard: [
+        'This feels like a high-momentum day.',
+        'You have real lift in the air today.',
+        'Ride the wave smoothly.',
+        'There is room for meaningful progress here.',
+      ],
+      tasks: [
+        'This is a good moment for important work.',
+        'Push the meaningful tasks forward first.',
+        'Flow through the list with intent.',
+        'Steady progress will feel natural today.',
+      ],
+      focus: [
+        'This is the kind of day for deep focus.',
+        'Lock into the work that matters most.',
+        'Find your rhythm and stay with it.',
+        'Longer focus should feel good right now.',
+      ],
+      stats: [
+        'These numbers look like momentum, not luck.',
+        'You are building a pattern worth keeping.',
+        'The scoreboard is reflecting real consistency.',
+        'Your progress has shape and direction now.',
+      ],
     },
     overwhelmed: {
-      dashboard: ['It’s a lot, but we’ll manage.', 'Take a deep breath. One thing at a time.', 'We will handle this gently.'],
-      tasks: ['Ignore the big list. Pick one small thing.', 'We don’t need to do it all now.', 'Just one quiet task.'],
-      focus: ['Just focus on this one thing.', 'Let the noise fade away.', 'Breathe out the overwhelm.']
-    }
+      dashboard: [
+        'You do not need to solve everything at once.',
+        'The day can shrink down to one step.',
+        'Take a breath. We will handle this gently.',
+        'It is okay to make today smaller.',
+      ],
+      tasks: [
+        'Choose the clearest next move.',
+        'Let the list be bigger than today.',
+        'One quiet task is enough for now.',
+        'Ignore the whole pile and pick one thing.',
+      ],
+      focus: [
+        'Borrow calm from the timer.',
+        'One protected pocket of attention is enough.',
+        'Let the noise fade to the edges.',
+        'Just stay with this one thing.',
+      ],
+      stats: [
+        'Your history proves you come back from heavy days.',
+        'The record is bigger than today\'s stress.',
+        'Your progress did not disappear because today feels loud.',
+        'This timeline has more resilience than today suggests.',
+      ],
+    },
   },
   strict: {
     lazy: {
-      dashboard: ['Stop being lazy and start executing.', 'Your lack of momentum is unacceptable.', 'Get moving.'],
-      tasks: ['Do the easiest task just to start moving.', 'Stop staring at the list.', 'Pick one and execute.'],
-      focus: ['Force yourself to focus for 10 minutes.', 'No excuses. Start working.', 'Lock in right now.']
+      dashboard: [
+        'Momentum is created, not found.',
+        'This drift ends now.',
+        'Get moving.',
+        'Your pace needs correction immediately.',
+      ],
+      tasks: [
+        'Action first, motivation later.',
+        'Clear one task and regain control.',
+        'Stop staring at the list and execute.',
+        'Pick the easiest target and finish it.',
+      ],
+      focus: [
+        'Sit down and concentrate.',
+        'Discipline begins with a single session.',
+        'No excuses. Start working.',
+        'Lock in right now.',
+      ],
+      stats: [
+        'The numbers expose effort honestly.',
+        'Progress is measurable. So is avoidance.',
+        'Use the data and correct your pace.',
+        'Your record does not care about excuses.',
+      ],
     },
     productive: {
-      dashboard: ['Good energy. Do not waste it.', 'Maximize your output today.', 'Total efficiency required.'],
-      tasks: ['Crush these high-priority missions.', 'Clear the board. Total victory.', 'Leave nothing unfinished.'],
-      focus: ['Absolute concentration.', 'Unleash your full potential right now.', 'No distractions allowed.']
+      dashboard: [
+        'Strong day. Convert it into results.',
+        'High capacity demands high standards.',
+        'Good energy. Do not waste it.',
+        'Maximize output while the window is open.',
+      ],
+      tasks: [
+        'Attack the most important work first.',
+        'Use this momentum with precision.',
+        'Clear the board with intent.',
+        'High-priority missions should fall today.',
+      ],
+      focus: [
+        'This is a session for serious output.',
+        'Concentrate with intent.',
+        'Absolute concentration is available now.',
+        'No distractions allowed.',
+      ],
+      stats: [
+        'These totals are evidence of disciplined work.',
+        'The scoreboard rewards consistency, not hype.',
+        'Your output is becoming visible.',
+        'This progress curve should continue upward.',
+      ],
     },
     overwhelmed: {
-      dashboard: ['Overwhelmed? That means poor planning.', 'Discipline beats feeling overwhelmed.', 'Regain control.'],
-      tasks: ['Stop crying about the list. Execute the top priority.', 'Focus on what matters, ignore the rest.', 'Prioritize immediately.'],
-      focus: ['Block the noise. One task only.', 'Pure focus is your only escape.', 'Silence the panic. Work.']
-    }
+      dashboard: [
+        'Control returns when priorities are enforced.',
+        'Reduce chaos through structure.',
+        'Regain control.',
+        'Discipline beats feeling overwhelmed.',
+      ],
+      tasks: [
+        'Rank the work, then act.',
+        'Cut the noise and choose the critical task.',
+        'Prioritize immediately.',
+        'Focus on what matters and ignore the rest.',
+      ],
+      focus: [
+        'A narrow target beats scattered effort.',
+        'Constrain your attention and proceed.',
+        'One task only.',
+        'Silence the panic. Work.',
+      ],
+      stats: [
+        'Past execution is your evidence, not your mood.',
+        'Use the data to restore order.',
+        'Your totals show capability even when today feels messy.',
+        'This scoreboard is a control panel, not decoration.',
+      ],
+    },
   },
   funny: {
     lazy: {
-      dashboard: ['Wow, the energy levels are negative.', 'Is your bed holding you hostage?', 'Doing the absolute minimum today.'],
-      tasks: ['Can we at least do one thing to pretend we tried?', 'Pick a task. Any task.', 'Please just click something.'],
-      focus: ['Pretend you are working.', 'Let’s try to focus for a whole 5 minutes.', 'Stare at the screen very hard.']
+      dashboard: [
+        'Productivity has left the chat.',
+        'This vibe is one strong yawn.',
+        'Doing the absolute minimum today.',
+        'Your energy levels are sending a warning.',
+      ],
+      tasks: [
+        'Choose the task least likely to fight back.',
+        'Let us complete one task for the illusion of control.',
+        'Pick a task. Any task.',
+        'Please click something useful.',
+      ],
+      focus: [
+        'Let us cosplay as concentrated people.',
+        'One tiny focus session for dramatic effect.',
+        'Pretend you are working convincingly.',
+        'Stare at the screen with purpose.',
+      ],
+      stats: [
+        'The stats are trying not to judge you.',
+        'Your progress chart survived your nap arc.',
+        'Look, numbers. Proof that things happened.',
+        'Honestly, this is better than expected.',
+      ],
     },
     productive: {
-      dashboard: ['Who replaced your coffee with rocket fuel?', 'Look who decided to be a functional adult.', 'Overachiever mode.'],
-      tasks: ['Don’t do them all at once, you’ll make us look bad.', 'Crushing missions like a boss.', 'Calm down, terminator.'],
-      focus: ['Hyperfixation activated.', 'Don’t forget to blink while you focus.', 'Try not to break the keyboard.']
+      dashboard: [
+        'This is suspiciously competent behavior.',
+        'You are one spreadsheet away from being unstoppable.',
+        'Overachiever mode detected.',
+        'Who replaced your coffee with rocket fuel?',
+      ],
+      tasks: [
+        'This to-do list is about to get bullied.',
+        'Please leave at least one task for tomorrow.',
+        'Crushing missions like a boss.',
+        'Calm down, terminator.',
+      ],
+      focus: [
+        'This is premium locked-in behavior.',
+        'Channel the chaos into something useful.',
+        'Hyperfixation activated.',
+        'Try not to break the keyboard.',
+      ],
+      stats: [
+        'These stats are getting annoyingly impressive.',
+        'The numbers say you might actually know what you are doing.',
+        'This scoreboard is starting to brag on your behalf.',
+        'Rude amount of progress, honestly.',
+      ],
     },
     overwhelmed: {
-      dashboard: ['Everything is on fire, but it’s fine.', 'Welcome to the chaos zone.', 'This is fine.'],
-      tasks: ['So many tasks, so little desire to do them.', 'Just pick one and hope the rest disappear.', 'Close your eyes and point.'],
-      focus: ['Focus on this so you can ignore everything else.', 'Hide from the responsibilities here.', 'Tunnel vision engaged.']
-    }
-  }
+      dashboard: [
+        'Today feels like seven tabs playing audio at once.',
+        'The circus is in town and it is your brain.',
+        'Welcome to the chaos zone.',
+        'Everything is on fire, but it is fine.',
+      ],
+      tasks: [
+        'Pick the task least likely to start a sequel.',
+        'Let us choose one task before the plot thickens.',
+        'Just pick one and hope the rest disappear.',
+        'Close your eyes and point if needed.',
+      ],
+      focus: [
+        'Use the timer as emotional camouflage.',
+        'One task only. The rest can wait outside.',
+        'Tunnel vision engaged.',
+        'Hide from the responsibilities in here.',
+      ],
+      stats: [
+        'The stats are calmer than your nervous system.',
+        'Your progress survived the chaos gremlin.',
+        'This chart says you are doing better than the panic claims.',
+        'Even with the mess, the numbers kept counting.',
+      ],
+    },
+  },
 };
 
 function getStableRandomElement(arr: string[], seedString: string): string {
@@ -95,12 +284,12 @@ export function generateDynamicQuote(
   now = new Date()
 ): string {
   const seedPrefix = `${now.toDateString()}-${now.getHours()}`;
-  
+
   const greetingsList = GREETINGS[personality]?.[timeOfDay] || GREETINGS.chill.morning;
-  const greeting = getStableRandomElement(greetingsList, seedPrefix + category + 'greeting');
-  
+  const greeting = getStableRandomElement(greetingsList, `${seedPrefix}-${category}-greeting`);
+
   const adviceList = ADVICE[personality]?.[mood]?.[category] || ADVICE.chill.productive.dashboard;
-  const advice = getStableRandomElement(adviceList, seedPrefix + category + 'advice');
-  
+  const advice = getStableRandomElement(adviceList, `${seedPrefix}-${category}-advice`);
+
   return `${greeting} ${advice}`;
 }

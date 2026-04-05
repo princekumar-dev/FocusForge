@@ -75,7 +75,7 @@ const personalityConfigs: Record<
 
 import { generateDynamicQuote } from './quotesLibrary';
 
-export type QuoteCategory = 'dashboard' | 'tasks' | 'focus';
+export type QuoteCategory = 'dashboard' | 'tasks' | 'focus' | 'stats';
 
 function getLocalHour(now = new Date()): number {
   try {
@@ -168,6 +168,7 @@ export function getProfileExperience(profile: UserProfile | null, now = new Date
   const dashboardQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'dashboard', now);
   const taskQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'tasks', now);
   const focusQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'focus', now);
+  const statsQuote = generateDynamicQuote(personalityKey, moodKey, timeOfDay, 'stats', now);
 
   return {
     mood,
@@ -175,6 +176,7 @@ export function getProfileExperience(profile: UserProfile | null, now = new Date
     dashboardGreeting: dashboardQuote,
     focusCoaching: focusQuote,
     taskCoaching: taskQuote,
+    statsReflection: statsQuote,
     completionMessage: `${personality.completionPrefix} work. ${mood.summary}`,
     ambientPreset: mood.ambientPreset,
   };
