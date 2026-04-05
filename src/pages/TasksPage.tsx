@@ -55,8 +55,8 @@ export default function TasksPage() {
   const [formDesc, setFormDesc] = useState('');
   const [formPriority, setFormPriority] = useState('medium');
   const [formCategory, setFormCategory] = useState('Work');
-  const [formXp, setFormXp] = useState(10);
-  const [formEnergy, setFormEnergy] = useState(10);
+  const [formXp, setFormXp] = useState<number | string>(10);
+  const [formEnergy, setFormEnergy] = useState<number | string>(10);
 
   const fetchTasks = async () => {
     try {
@@ -119,8 +119,8 @@ export default function TasksPage() {
       priority: formPriority,
       category: formCategory,
       status: 'pending',
-      xp_reward: formXp,
-      energy_cost: formEnergy,
+      xp_reward: Number(formXp) || 0,
+      energy_cost: Number(formEnergy) || 0,
       order_index: tasks.length,
       created_at: new Date().toISOString(),
     };
@@ -444,7 +444,7 @@ export default function TasksPage() {
                 <Input
                   type="number"
                   value={formXp}
-                  onChange={(e) => setFormXp(Number(e.target.value))}
+                  onChange={(e) => setFormXp(e.target.value)}
                   min={1}
                   max={100}
                   className="glass rounded-2xl border-white/20 h-12 text-center font-black"
@@ -455,7 +455,7 @@ export default function TasksPage() {
                 <Input
                   type="number"
                   value={formEnergy}
-                  onChange={(e) => setFormEnergy(Number(e.target.value))}
+                  onChange={(e) => setFormEnergy(e.target.value)}
                   min={1}
                   max={50}
                   className="glass rounded-2xl border-white/20 h-12 text-center font-black"
