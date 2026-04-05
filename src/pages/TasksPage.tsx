@@ -57,6 +57,7 @@ export default function TasksPage() {
   const [formCategory, setFormCategory] = useState('Work');
   const [formXp, setFormXp] = useState<number | string>(10);
   const [formEnergy, setFormEnergy] = useState<number | string>(10);
+  const [formDueDate, setFormDueDate] = useState('');
 
   const fetchTasks = async () => {
     try {
@@ -94,6 +95,7 @@ export default function TasksPage() {
     setFormCategory('Work');
     setFormXp(experience.mood.defaultXpReward);
     setFormEnergy(experience.mood.defaultEnergyCost);
+    setFormDueDate('');
   };
 
   const openEdit = (task: Task) => {
@@ -104,6 +106,9 @@ export default function TasksPage() {
     setFormCategory(task.category || 'Work');
     setFormXp(task.xp_reward || 10);
     setFormEnergy(task.energy_cost || 10);
+    // Format ISO to datetime-local (YYYY-MM-DDTHH:mm)
+    const d = task.due_date ? new Date(task.due_date) : null;
+    setFormDueDate(d ? new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '');
     setShowAdd(true);
   };
 
@@ -121,6 +126,7 @@ export default function TasksPage() {
       status: 'pending',
       xp_reward: Number(formXp),
       energy_cost: Number(formEnergy),
+      due_date: formDueDate ? new Date(formDueDate).toISOString() : null,
       order_index: tasks.length,
       created_at: new Date().toISOString(),
     };
@@ -437,6 +443,15 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/90 ml-1">Mission Start Time</label>
+              <Input
+                type="datetime-local"
+                value={formDueDate}
+                onChange={(e) => setFormDueDate(e.target.value)}
+                className="glass rounded-2xl border-white/20 h-12 px-4 font-bold"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
