@@ -66,10 +66,6 @@ const TOKEN_REFRESH_INTERVAL_MS = 50 * 60 * 1000;
 // Key used to store the timestamp (ms) when the backend token was last obtained.
 const TOKEN_TIMESTAMP_KEY = 'token_obtained_at';
 
-/**
- * Returns true if the stored backend token is likely still valid.
- * We consider it valid if it was obtained less than TOKEN_REFRESH_INTERVAL_MS ago.
- */
 function isTokenFresh(): boolean {
   const obtainedAt = localStorage.getItem(TOKEN_TIMESTAMP_KEY);
   if (!obtainedAt) return false;
@@ -77,7 +73,23 @@ function isTokenFresh(): boolean {
   return age < TOKEN_REFRESH_INTERVAL_MS;
 }
 
-// Key used to track the last date energy was reset (format: YYYY-MM-DD).
+function getEnergyResetKey(userId: string): string {
+  return `last_energy_reset:${userId}`;
+}
+
+function getLocalDateKey(now = new Date()): string {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getMillisecondsUntilNextMidnight(now = new Date()): number {
+  const nextMidnight = new Date(now);
+  nextMidnight.setHours(24, 0, 0, 0);
+  return Math.max(1000, nextMidnight.getTime() - now.getTime());
+}
+
 const ENERGY_RESET_KEY = 'last_energy_reset';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -94,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const profileFetchInProgress = useRef(false);
   // Ref for the periodic refresh timer so we can clean it up.
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const midnightResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const user: User | null = clerkUser
     ? {
@@ -102,6 +115,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: clerkUser.fullName ?? clerkUser.firstName ?? clerkUser.username ?? undefined,
       }
     : null;
+
+  const ensureDailyEnergyReset = useCallback(
+    async (existingProfile: UserProfile): Promise<UserProfile> => {
+      if (!clerkUser) return existingProfile;
+
+      const today = getLocalDateKey();
+      const resetKey = getEnergyResetKey(clerkUser.id);
+      const lastReset = localStorage.getItem(resetKey);
+      const resetEnergy = DEFAULT_PROFILE.max_energy;
+
+      if (lastReset === today) {
+        return existingProfile;
+      }
+
+      if (existingProfile.energy === resetEnergy) {
+        localStorage.setItem(resetKey, today);
+        return existingProfile;
+      }
+
+      try {
+        const resetRes = await client.entities.user_profiles.update({
+          id: String(existingProfile.id),
+          data: { energy: resetEnergy },
+        });
+        localStorage.setItem(resetKey, today);
+        return (resetRes?.data as UserProfile) || { ...existingProfile, energy: resetEnergy };
+      } catch {
+        return existingProfile;
+      }
+    },
+    [clerkUser]
+  );
 
   // ─── Token exchange helper ────────────────────────────────────────────
   // Silently exchanges the current Clerk session token for a backend token.
@@ -187,7 +232,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        setProfile(existing);
+        const normalizedProfile = await ensureDailyEnergyReset(existing);
+        setProfile(normalizedProfile);
+        return;
 
         // ── Daily energy reset ──────────────────────────────────────
         // Check if today's date differs from the last reset date.
@@ -242,7 +289,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfileLoading(false);
       profileFetchInProgress.current = false;
     }
-  }, [clerkUser]);
+  }, [clerkUser, ensureDailyEnergyReset]);
 
   const refreshProfile = useCallback(async () => {
     await fetchProfile();
@@ -379,6 +426,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     void fetchProfile();
   }, [backendReady, clerkUser, fetchProfile, isLoaded, isSignedIn]);
+
+  useEffect(() => {
+    if (midnightResetTimerRef.current) {
+      clearTimeout(midnightResetTimerRef.current);
+      midnightResetTimerRef.current = null;
+    }
+
+    if (!isLoaded || !isSignedIn || !clerkUser || !backendReady || !profile) {
+      return;
+    }
+
+    const scheduleNextReset = () => {
+      midnightResetTimerRef.current = setTimeout(async () => {
+        await fetchProfile();
+        scheduleNextReset();
+      }, getMillisecondsUntilNextMidnight());
+    };
+
+    scheduleNextReset();
+
+    return () => {
+      if (midnightResetTimerRef.current) {
+        clearTimeout(midnightResetTimerRef.current);
+        midnightResetTimerRef.current = null;
+      }
+    };
+  }, [backendReady, clerkUser, fetchProfile, isLoaded, isSignedIn, profile]);
 
   // ─── Login / Logout ───────────────────────────────────────────────────
   const login = useCallback(async () => {
