@@ -119,8 +119,8 @@ export default function TasksPage() {
       priority: formPriority,
       category: formCategory,
       status: 'pending',
-      xp_reward: Number(formXp) || 0,
-      energy_cost: Number(formEnergy) || 0,
+      xp_reward: Number(formXp),
+      energy_cost: Number(formEnergy),
       order_index: tasks.length,
       created_at: new Date().toISOString(),
     };
@@ -153,9 +153,9 @@ export default function TasksPage() {
         data: { status: 'completed', completed_at: new Date().toISOString() },
       });
 
-      const newXp = (profile.xp || 0) + (task.xp_reward || 10);
-      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward || 10);
-      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost || 10));
+      const newXp = (profile.xp || 0) + (task.xp_reward ?? 10);
+      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward ?? 10);
+      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost ?? 10));
       const newTasksCompleted = (profile.tasks_completed || 0) + 1;
       const xpNeeded = (profile.level || 1) * 100;
       let newLevel = profile.level || 1;
@@ -178,7 +178,7 @@ export default function TasksPage() {
       setTasks((prev) => prev.filter((t) => t.id !== task.id));
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
-      toast.success(`${experience.personality.completionPrefix} work. +${task.xp_reward || 10} XP`);
+      toast.success(`${experience.personality.completionPrefix} work. +${task.xp_reward ?? 10} XP`);
     } catch (err) {
       toast.error('Failed to complete task');
     }
