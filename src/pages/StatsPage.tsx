@@ -205,7 +205,13 @@ export default function StatsPage() {
                 >
                   {day.date}
                   {day.isToday && (
-                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
+                    <div className="absolute -top-1.5 -right-1.5 animate-pulse">
+                      {day.active ? (
+                        <Flame className="w-4 h-4 text-orange-500 fill-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
+                      ) : (
+                        <div className="w-2.5 h-2.5 bg-primary rounded-full border-2 border-background" />
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
