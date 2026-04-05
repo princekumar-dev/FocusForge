@@ -37,6 +37,21 @@ interface Task {
   energy_cost: number;
 }
 
+const priorityColor = (p: string) => {
+  switch (p) {
+    case 'high': return 'text-destructive font-bold';
+    case 'medium': return 'text-foreground font-semibold';
+    default: return 'text-muted-foreground';
+  }
+};
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'morning';
+  if (hour < 17) return 'afternoon';
+  return 'evening';
+}
+
 export default function DashboardPage() {
   const { user, profile, loading, login, refreshProfile, updateProfile } = useAuth();
   const { playAvatarSound } = useAvatarSound();
@@ -151,16 +166,9 @@ export default function DashboardPage() {
   const energyPercent = (energy / maxEnergy) * 100;
   const streak = profile?.streak || 0;
   const treeStage = Math.min(4, Math.max(1, profile?.tree_stage || 1));
+
   const todayTasks = tasks.slice(0, 5);
   const pendingCount = tasks.length;
-
-  const priorityColor = (p: string) => {
-    switch (p) {
-      case 'high': return 'text-destructive font-bold';
-      case 'medium': return 'text-foreground font-semibold';
-      default: return 'text-muted-foreground';
-    }
-  };
 
   return (
     <div className="min-h-[100dvh] pb-safe">
@@ -204,12 +212,12 @@ export default function DashboardPage() {
           <div className="relative h-4 bg-white/10 rounded-full border border-white/5 mt-1">
             <div 
               className="absolute inset-y-0 left-0 bg-primary transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]"
-              style={{ width: `${xpPercent}%` }}
+              style={{ transform: `translate3d(0, 0, 0)`, width: `${xpPercent}%` }}
             />
             {/* Avatar Caret */}
             <div 
               className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10 animate-float-subtle"
-              style={{ left: `calc(${xpPercent}% - 8px)` }}
+              style={{ transform: `translate3d(${xpPercent}%, -50%, 0)`, left: `-8px` }}
               onClick={() => playAvatarSound(profile?.avatar || '🌱')}
             >
               {profile?.avatar || '🌱'}
@@ -269,12 +277,12 @@ export default function DashboardPage() {
           <div className="relative h-4 bg-white/10 rounded-full border border-white/5 mt-1">
             <div 
               className="absolute inset-y-0 left-0 bg-yellow-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(234,179,8,0.3)]"
-              style={{ width: `${energyPercent}%` }}
+              style={{ transform: `translate3d(0, 0, 0)`, width: `${energyPercent}%` }}
             />
             {/* Avatar Caret */}
             <div 
               className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10 animate-float-subtle"
-              style={{ left: `calc(${energyPercent}% - 8px)` }}
+              style={{ transform: `translate3d(${energyPercent}%, -50%, 0)`, left: `-8px` }}
               onClick={() => playAvatarSound(profile?.avatar || '🌱')}
             >
               {profile?.avatar || '🌱'}
@@ -398,11 +406,4 @@ export default function DashboardPage() {
       <BottomNav />
     </div>
   );
-}
-
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'morning';
-  if (hour < 17) return 'afternoon';
-  return 'evening';
 }

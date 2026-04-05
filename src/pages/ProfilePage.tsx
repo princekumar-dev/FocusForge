@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getProfileExperience } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
@@ -35,7 +35,7 @@ export default function ProfilePage() {
   const [darkMode, setDarkMode] = useState(
     document.documentElement.classList.contains('dark')
   );
-  const experience = getProfileExperience(profile);
+  const experience = useMemo(() => getProfileExperience(profile), [profile]);
 
   useEffect(() => {
     setNameValue(profile?.display_name || '');
@@ -57,25 +57,23 @@ export default function ProfilePage() {
     toast.success('Identity updated!');
   };
 
-  const selectAvatar = async (avatar: string) => {
+  const selectAvatar = (avatar: string) => {
     playAvatarSound(avatar);
-    await updateProfile({ avatar });
+    updateProfile({ avatar });
     toast.success('Avatar updated!');
   };
 
-
-  const selectPersonality = async (mode: string) => {
+  const selectPersonality = (mode: string) => {
     const selected = PERSONALITY_MODES.find(m => m.id === mode);
     if (selected) playAvatarSound(selected.emoji);
-    await updateProfile({ personality_mode: mode });
+    updateProfile({ personality_mode: mode });
     toast.success('Personality mode synced!');
   };
 
-
-  const selectMood = async (mood: string) => {
+  const selectMood = (mood: string) => {
     const selected = MOODS.find(m => m.id === mood);
     if (selected) playAvatarSound(selected.emoji);
-    await updateProfile({ mood });
+    updateProfile({ mood });
     toast.success('Internal vibe set. Missions adjusted.');
   };
 
@@ -166,7 +164,7 @@ export default function ProfilePage() {
             <User className="w-4 h-4 text-primary" /> Visual Uplink
           </h3>
           <div className="grid grid-cols-6 gap-3">
-            {AVATARS.map((avatar) => (
+            {useMemo(() => AVATARS.map((avatar) => (
               <button
                 key={avatar}
                 onClick={() => selectAvatar(avatar)}
@@ -178,8 +176,7 @@ export default function ProfilePage() {
               >
                 {avatar}
               </button>
-
-            ))}
+            )), [profile?.avatar])}
           </div>
         </Card>
 
@@ -189,15 +186,16 @@ export default function ProfilePage() {
             <Brain className="w-4.5 h-4.5 text-primary" /> Neural Pattern
           </h3>
           <div className="space-y-3.5">
-            {PERSONALITY_MODES.map((mode) => (
+            {useMemo(() => PERSONALITY_MODES.map((mode) => (
               <button
                 key={mode.id}
                 onClick={() => selectPersonality(mode.id)}
-                className={`w-full p-4.5 rounded-[1.5rem] text-left flex items-center gap-4 transition-all duration-300 border shadow-xl ${
+                className={`w-full p-4.5 rounded-[1.5rem] text-left flex items-center gap-4 transition-[transform,colors,shadow] duration-300 ease-out border shadow-xl ${
                   profile?.personality_mode === mode.id
-                    ? 'bg-primary text-primary-foreground border-transparent scale-[1.02] shadow-primary/20'
+                    ? 'bg-primary text-primary-foreground border-transparent z-10 shadow-primary/20'
                     : 'glass border-white/10 hover:border-white/30 hover:bg-white/10'
                 }`}
+                style={{ transform: profile?.personality_mode === mode.id ? 'translate3d(0,0,10px) scale(1.02)' : 'translate3d(0,0,0)' }}
               >
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner ${
                   profile?.personality_mode === mode.id ? 'bg-white/20 shadow-white/10' : 'bg-white/5 border border-white/5'
@@ -212,7 +210,7 @@ export default function ProfilePage() {
                 </div>
                 {profile?.personality_mode === mode.id && <ShieldCheck className="w-6 h-6 text-white/50" />}
               </button>
-            ))}
+            )), [profile?.personality_mode])}
           </div>
         </Card>
 
@@ -222,20 +220,21 @@ export default function ProfilePage() {
             <Smile className="w-4.5 h-4.5 text-primary" /> Core Vitality
           </h3>
           <div className="grid grid-cols-3 gap-3.5">
-            {MOODS.map((mood) => (
+            {useMemo(() => MOODS.map((mood) => (
               <button
                 key={mood.id}
                 onClick={() => selectMood(mood.id)}
-                className={`p-5 rounded-[1.8rem] text-center transition-all duration-500 border shadow-xl ${
+                className={`px-2 py-6 rounded-[1.8rem] text-center transition-[transform,colors,shadow] duration-300 ease-out border shadow-xl ${
                   profile?.mood === mood.id
                     ? 'bg-primary text-primary-foreground border-transparent scale-110 shadow-primary/30 z-10'
                     : 'glass border-white/10 opacity-70 hover:opacity-100 hover:scale-105'
                 }`}
+                style={{ transform: profile?.mood === mood.id ? 'translate3d(0,0,10px) scale(1.1)' : 'translate3d(0,0,0)' }}
               >
-                <span className="text-4xl block mb-2 drop-shadow-lg transition-transform hover:scale-120">{mood.emoji}</span>
-                <p className="text-[10px] font-black uppercase tracking-widest">{mood.label}</p>
+                <span className="text-4xl block mb-2 drop-shadow-lg">{mood.emoji}</span>
+                <p className="text-[9px] font-black uppercase tracking-tight whitespace-nowrap px-1">{mood.label}</p>
               </button>
-            ))}
+            )), [profile?.mood])}
           </div>
         </Card>
 

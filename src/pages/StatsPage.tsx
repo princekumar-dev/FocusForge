@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
 import { getProfileExperience } from '@/lib/profileExperience';
@@ -42,6 +42,30 @@ export default function StatsPage() {
     fetchStats();
   }, [user]);
 
+  const level = profile?.level || 1;
+  const xp = profile?.xp || 0;
+  const totalXp = profile?.total_xp || 0;
+  const xpNeeded = level * 100;
+  const xpPercent = Math.min(100, (xp / xpNeeded) * 100);
+  const streak = profile?.streak || 0;
+  const bestStreak = profile?.best_streak || 0;
+  const tasksCompleted = profile?.tasks_completed || 0;
+  const focusMinutes = profile?.focus_minutes || 0;
+  const treeStage = Math.min(4, Math.max(1, profile?.tree_stage || 1));
+
+  // Generate last 7 days for streak calendar
+  const last7Days = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return {
+        day: d.toLocaleDateString('en', { weekday: 'short' }),
+        date: d.getDate(),
+        active: i >= 7 - streak,
+      };
+    });
+  }, [streak]);
+
   if (!user) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center p-6 text-center">
@@ -58,28 +82,6 @@ export default function StatsPage() {
       </div>
     );
   }
-
-  const level = profile?.level || 1;
-  const xp = profile?.xp || 0;
-  const totalXp = profile?.total_xp || 0;
-  const xpNeeded = level * 100;
-  const xpPercent = Math.min(100, (xp / xpNeeded) * 100);
-  const streak = profile?.streak || 0;
-  const bestStreak = profile?.best_streak || 0;
-  const tasksCompleted = profile?.tasks_completed || 0;
-  const focusMinutes = profile?.focus_minutes || 0;
-  const treeStage = Math.min(4, Math.max(1, profile?.tree_stage || 1));
-
-  // Generate last 7 days for streak calendar
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
-    return {
-      day: d.toLocaleDateString('en', { weekday: 'short' }),
-      date: d.getDate(),
-      active: i >= 7 - streak,
-    };
-  });
 
   return (
     <div className="min-h-[100dvh] pb-safe">
@@ -111,7 +113,7 @@ export default function StatsPage() {
               <div className="relative h-3 bg-white/10 rounded-full overflow-hidden border border-white/5">
                 <div 
                   className="absolute inset-y-0 left-0 bg-primary transition-all duration-1000 ease-out"
-                  style={{ width: `${xpPercent}%` }}
+                  style={{ transform: `translate3d(0, 0, 0)`, width: `${xpPercent}%` }}
                 />
               </div>
               <p className="text-[10px] font-black text-foreground/40 mt-1 uppercase tracking-widest text-shadow-sm">Total Earned: {totalXp} XP</p>
