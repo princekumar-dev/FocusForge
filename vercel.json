@@ -1,5 +1,11 @@
 {
-  "framework": "vite",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
   "installCommand": "npm install -g pnpm@10.27.0 && pnpm install --prefix frontend",
   "buildCommand": "pnpm --prefix frontend run build",
   "outputDirectory": "frontend/dist",
