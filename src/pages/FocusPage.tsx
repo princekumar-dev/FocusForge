@@ -33,7 +33,7 @@ const TIMER_PRESETS = [
 ];
 
 export default function FocusPage() {
-  const { user, profile, login, updateProfile } = useAuth();
+  const { user, profile, login, updateProfile, backendReady } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<string>('');
   const [duration, setDuration] = useState(25);
@@ -61,10 +61,10 @@ export default function FocusPage() {
   }, [ambientSound, isRunning, isBreak, ambientPreset, play, stop]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !backendReady) return;
     client.entities.tasks.query({ query: { status: 'pending' }, limit: 50 })
       .then(res => setTasks(res?.data?.items as Task[] || []));
-  }, [user]);
+  }, [user, backendReady]);
 
   const startTimer = () => {
     playAvatarSound(profile?.avatar || '🌱');

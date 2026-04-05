@@ -53,7 +53,7 @@ function getGreeting() {
 }
 
 export default function DashboardPage() {
-  const { user, profile, loading, login, refreshProfile, updateProfile } = useAuth();
+  const { user, profile, loading, login, refreshProfile, updateProfile, backendReady } = useAuth();
   const { playAvatarSound } = useAvatarSound();
   const experience = getProfileExperience(profile);
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export default function DashboardPage() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !backendReady) return;
     const fetchTasks = async () => {
       try {
         const res = await client.entities.tasks.query({
@@ -79,7 +79,7 @@ export default function DashboardPage() {
       }
     };
     fetchTasks();
-  }, [user]);
+  }, [user, backendReady]);
 
   const completeTask = async (task: Task) => {
     if (!profile) return;

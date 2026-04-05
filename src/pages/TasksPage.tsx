@@ -36,7 +36,7 @@ interface Task {
 }
 
 export default function TasksPage() {
-  const { user, profile, login, updateProfile } = useAuth();
+  const { user, profile, login, updateProfile, backendReady } = useAuth();
   const { playAvatarSound } = useAvatarSound();
   const experience = getProfileExperience(profile);
 
@@ -75,12 +75,12 @@ export default function TasksPage() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && backendReady) {
       void fetchTasks();
     } else {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, backendReady]);
 
   useEffect(() => {
     if (!profile || showAdd || editTask) return;

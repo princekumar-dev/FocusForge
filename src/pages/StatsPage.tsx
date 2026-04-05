@@ -18,13 +18,13 @@ const TREE_IMAGES = [
 ];
 
 export default function StatsPage() {
-  const { user, profile, login } = useAuth();
+  const { user, profile, login, backendReady } = useAuth();
   const experience = getProfileExperience(profile);
   const [completedCount, setCompletedCount] = useState(0);
   const [recentCompleted, setRecentCompleted] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !backendReady) return;
     const fetchStats = async () => {
       try {
         const res = await client.entities.tasks.query({
@@ -40,7 +40,7 @@ export default function StatsPage() {
       }
     };
     fetchStats();
-  }, [user]);
+  }, [user, backendReady]);
 
   const level = profile?.level || 1;
   const xp = profile?.xp || 0;
