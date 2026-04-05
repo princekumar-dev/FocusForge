@@ -8,4 +8,7 @@
   ],
   "installCommand": "npm install -g pnpm@10.27.0 && pnpm install",
   "buildCommand": "pnpm run build"
-}
+  ,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
