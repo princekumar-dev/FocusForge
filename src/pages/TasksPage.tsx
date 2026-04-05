@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
-import { getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
+import { getProfileExperience } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,10 +36,9 @@ interface Task {
 }
 
 export default function TasksPage() {
-  const { user, profile, login, updateProfile, backendReady } = useAuth();
+  const { user, profile, login, updateProfile } = useAuth();
   const { playAvatarSound } = useAvatarSound();
-  const now = useQuoteClock();
-  const experience = getProfileExperience(profile, now);
+  const experience = getProfileExperience(profile);
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,9 +55,8 @@ export default function TasksPage() {
   const [formDesc, setFormDesc] = useState('');
   const [formPriority, setFormPriority] = useState('medium');
   const [formCategory, setFormCategory] = useState('Work');
-  const [formXp, setFormXp] = useState<number | string>(10);
-  const [formEnergy, setFormEnergy] = useState<number | string>(10);
-  const [formDueDate, setFormDueDate] = useState('');
+  const [formXp, setFormXp] = useState(10);
+  const [formEnergy, setFormEnergy] = useState(10);
 
   const fetchTasks = async () => {
     try {
@@ -76,12 +74,12 @@ export default function TasksPage() {
   };
 
   useEffect(() => {
-    if (user && backendReady) {
+    if (user) {
       void fetchTasks();
     } else {
       setLoading(false);
     }
-  }, [user, backendReady]);
+  }, [user]);
 
   useEffect(() => {
     if (!profile || showAdd || editTask) return;
@@ -96,7 +94,6 @@ export default function TasksPage() {
     setFormCategory('Work');
     setFormXp(experience.mood.defaultXpReward);
     setFormEnergy(experience.mood.defaultEnergyCost);
-    setFormDueDate('');
   };
 
   const openEdit = (task: Task) => {
@@ -107,9 +104,6 @@ export default function TasksPage() {
     setFormCategory(task.category || 'Work');
     setFormXp(task.xp_reward || 10);
     setFormEnergy(task.energy_cost || 10);
-    // Format ISO to datetime-local (YYYY-MM-DDTHH:mm)
-    const d = task.due_date ? new Date(task.due_date) : null;
-    setFormDueDate(d ? new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '');
     setShowAdd(true);
   };
 
@@ -125,9 +119,8 @@ export default function TasksPage() {
       priority: formPriority,
       category: formCategory,
       status: 'pending',
-      xp_reward: Number(formXp),
-      energy_cost: Number(formEnergy),
-      due_date: formDueDate ? new Date(formDueDate).toISOString() : null,
+      xp_reward: formXp,
+      energy_cost: formEnergy,
       order_index: tasks.length,
       created_at: new Date().toISOString(),
     };
@@ -160,9 +153,9 @@ export default function TasksPage() {
         data: { status: 'completed', completed_at: new Date().toISOString() },
       });
 
-      const newXp = (profile.xp || 0) + (task.xp_reward ?? 10);
-      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward ?? 10);
-      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost ?? 10));
+      const newXp = (profile.xp || 0) + (task.xp_reward || 10);
+      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward || 10);
+      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost || 10));
       const newTasksCompleted = (profile.tasks_completed || 0) + 1;
       const xpNeeded = (profile.level || 1) * 100;
       let newLevel = profile.level || 1;
@@ -185,7 +178,7 @@ export default function TasksPage() {
       setTasks((prev) => prev.filter((t) => t.id !== task.id));
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
-      toast.success(`${experience.personality.completionPrefix} work. +${task.xp_reward ?? 10} XP`);
+      toast.success(`${experience.personality.completionPrefix} work. +${task.xp_reward || 10} XP`);
     } catch (err) {
       toast.error('Failed to complete task');
     }
@@ -232,7 +225,7 @@ export default function TasksPage() {
   const priorityBadge = (p: string) => {
     switch (p) {
       case 'high':
-        return <Badge className="bg-red-500/90 hover:bg-red-500 text-white text-[10px] uppercase font-black tracking-widest border border-red-400/30 shadow-lg shadow-red-500/20">High</Badge>;
+        return <Badge variant="destructive" className="glass text-[10px] uppercase font-black tracking-widest border-red-500/30">High</Badge>;
       case 'medium':
         return <Badge variant="secondary" className="glass text-[10px] uppercase font-black tracking-widest border-white/10">Med</Badge>;
       default:
@@ -445,22 +438,13 @@ export default function TasksPage() {
                 </Select>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/90 ml-1">Mission Start Time</label>
-              <Input
-                type="datetime-local"
-                value={formDueDate}
-                onChange={(e) => setFormDueDate(e.target.value)}
-                className="glass rounded-2xl border-white/20 h-12 px-4 font-bold"
-              />
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/90 ml-1">XP Reward</label>
                 <Input
                   type="number"
                   value={formXp}
-                  onChange={(e) => setFormXp(e.target.value)}
+                  onChange={(e) => setFormXp(Number(e.target.value))}
                   min={1}
                   max={100}
                   className="glass rounded-2xl border-white/20 h-12 text-center font-black"
@@ -471,7 +455,7 @@ export default function TasksPage() {
                 <Input
                   type="number"
                   value={formEnergy}
-                  onChange={(e) => setFormEnergy(e.target.value)}
+                  onChange={(e) => setFormEnergy(Number(e.target.value))}
                   min={1}
                   max={50}
                   className="glass rounded-2xl border-white/20 h-12 text-center font-black"

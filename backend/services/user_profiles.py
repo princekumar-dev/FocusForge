@@ -16,53 +16,11 @@ class User_profilesService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    @staticmethod
-    def _profile_score(profile: User_profiles) -> tuple:
-        """Rank profiles so mature/customized data wins over default duplicates."""
-        default_display_name = "Adventurer"
-        default_avatar = "\U0001F331"
-        default_personality = "chill"
-        default_mood = "productive"
-
-        total_xp = int(profile.total_xp or 0)
-        tasks_completed = int(profile.tasks_completed or 0)
-        focus_minutes = int(profile.focus_minutes or 0)
-        level = int(profile.level or 0)
-        customized_name = int(bool(profile.display_name and profile.display_name != default_display_name))
-        customized_avatar = int(bool(profile.avatar and profile.avatar != default_avatar))
-        customized_personality = int(bool(profile.personality_mode and profile.personality_mode != default_personality))
-        customized_mood = int(bool(profile.mood and profile.mood != default_mood))
-
-        return (
-            total_xp,
-            tasks_completed,
-            focus_minutes,
-            level,
-            customized_name,
-            customized_avatar,
-            customized_personality,
-            customized_mood,
-            int(profile.id or 0),
-        )
-
-    async def get_best_by_user_id(self, user_id: str) -> Optional[User_profiles]:
-        """Return the strongest profile for a user, not just the newest duplicate."""
-        result = await self.db.execute(
-            select(User_profiles).where(User_profiles.user_id == user_id).order_by(User_profiles.id.desc())
-        )
-        profiles = result.scalars().all()
-        if not profiles:
-            return None
-        return max(profiles, key=self._profile_score)
-
     async def create(self, data: Dict[str, Any], user_id: Optional[str] = None) -> Optional[User_profiles]:
         """Create a new user_profiles"""
         try:
             if user_id:
                 data['user_id'] = user_id
-                existing = await self.get_best_by_user_id(user_id)
-                if existing:
-                    return existing
             obj = User_profiles(**data)
             self.db.add(obj)
             await self.db.commit()

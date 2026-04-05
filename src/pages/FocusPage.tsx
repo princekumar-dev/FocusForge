@@ -4,7 +4,7 @@ import { client } from '@/lib/api';
 import { useAmbientSound, type AmbientPreset } from '@/hooks/useAmbientSound';
 import { useAvatarSound } from '@/hooks/useAvatarSound';
 
-import { getAmbientPresetLabel, getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
+import { getAmbientPresetLabel, getProfileExperience } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,7 +33,7 @@ const TIMER_PRESETS = [
 ];
 
 export default function FocusPage() {
-  const { user, profile, login, updateProfile, backendReady } = useAuth();
+  const { user, profile, login, updateProfile } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<string>('');
   const [duration, setDuration] = useState(25);
@@ -46,9 +46,8 @@ export default function FocusPage() {
   const [ambientPreset, setAmbientPreset] = useState<AmbientPreset>('focus');
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const now = useQuoteClock();
-  const experience = getProfileExperience(profile, now);
-  const timerRef = useRef<number | null>(null);
+  const experience = getProfileExperience(profile);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { play, stop } = useAmbientSound();
 
@@ -62,10 +61,10 @@ export default function FocusPage() {
   }, [ambientSound, isRunning, isBreak, ambientPreset, play, stop]);
 
   useEffect(() => {
-    if (!user || !backendReady) return;
+    if (!user) return;
     client.entities.tasks.query({ query: { status: 'pending' }, limit: 50 })
       .then(res => setTasks(res?.data?.items as Task[] || []));
-  }, [user, backendReady]);
+  }, [user]);
 
   const startTimer = () => {
     playAvatarSound(profile?.avatar || '🌱');
@@ -111,19 +110,14 @@ export default function FocusPage() {
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
-      timerRef.current = window.setInterval(() => {
+      timerRef.current = setInterval(() => {
         setLeft(t => t - 1);
-        console.log('Timer heartbeat');
+        console.log('Timer heartbeat:', timeLeft);
       }, 1000);
     } else if (timeLeft === 0) {
       completeSession();
     }
-    return () => {
-      if (timerRef.current !== null) {
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [isRunning, timeLeft, completeSession]);
 
   const changeDuration = (val: string) => {

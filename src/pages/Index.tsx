@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
-import { getProfileExperience, getTimeGreeting, useQuoteClock } from '@/lib/profileExperience';
+import { getProfileExperience } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -45,15 +45,17 @@ const priorityColor = (p: string) => {
   }
 };
 
-function getGreeting(now: Date = new Date()) {
-  return getTimeGreeting(now);
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'morning';
+  if (hour < 17) return 'afternoon';
+  return 'evening';
 }
 
 export default function DashboardPage() {
-  const { user, profile, loading, login, refreshProfile, updateProfile, backendReady } = useAuth();
+  const { user, profile, loading, login, refreshProfile, updateProfile } = useAuth();
   const { playAvatarSound } = useAvatarSound();
-  const now = useQuoteClock();
-  const experience = getProfileExperience(profile, now);
+  const experience = getProfileExperience(profile);
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -61,7 +63,7 @@ export default function DashboardPage() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!user || !backendReady) return;
+    if (!user) return;
     const fetchTasks = async () => {
       try {
         const res = await client.entities.tasks.query({
@@ -77,7 +79,7 @@ export default function DashboardPage() {
       }
     };
     fetchTasks();
-  }, [user, backendReady]);
+  }, [user]);
 
   const completeTask = async (task: Task) => {
     if (!profile) return;
@@ -87,9 +89,9 @@ export default function DashboardPage() {
         data: { status: 'completed', completed_at: new Date().toISOString() },
       });
 
-      const newXp = (profile.xp || 0) + (task.xp_reward ?? 10);
-      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward ?? 10);
-      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost ?? 10));
+      const newXp = (profile.xp || 0) + (task.xp_reward || 10);
+      const newTotalXp = (profile.total_xp || 0) + (task.xp_reward || 10);
+      const newEnergy = Math.max(0, (profile.energy || 100) - (task.energy_cost || 10));
       const newTasksCompleted = (profile.tasks_completed || 0) + 1;
       const xpNeeded = xpForLevel(profile.level || 1);
       let newLevel = profile.level || 1;
@@ -177,7 +179,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-muted-foreground/60 flex items-center gap-2 drop-shadow-sm">
-              Good {getGreeting(now)} <span className="text-base">👋</span>
+              Good {getGreeting()} <span className="text-base">👋</span>
             </p>
             <h1 className="text-5xl font-black text-foreground tracking-tighter drop-shadow-sm">{profile?.display_name || 'Adventurer'}</h1>
             <p className="text-sm text-foreground/70 font-semibold leading-relaxed max-w-[20rem] text-shadow-sm">{experience.dashboardGreeting}</p>
@@ -231,7 +233,7 @@ export default function DashboardPage() {
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">
                 {experience.personality.label} • {experience.mood.label}
               </p>
-              <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.homePulse}</p>
+              <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.taskCoaching}</p>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile')} className="rounded-xl border-white/20 hover:bg-white/10 transition-all font-bold text-[10px] uppercase tracking-wider">
               Tune vibe

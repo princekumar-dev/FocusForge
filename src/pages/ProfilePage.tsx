@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
+import { getProfileExperience } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,8 +35,7 @@ export default function ProfilePage() {
   const [nameValue, setNameValue] = useState(profile?.display_name || '');
   const { theme, setTheme } = useTheme();
   const darkMode = theme === 'dark';
-  const now = useQuoteClock();
-  const experience = useMemo(() => getProfileExperience(profile, now), [now, profile]);
+  const experience = useMemo(() => getProfileExperience(profile), [profile]);
 
   useEffect(() => {
     setNameValue(profile?.display_name || '');

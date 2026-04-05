@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
-import { getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
+import { getProfileExperience } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,30 +18,29 @@ const TREE_IMAGES = [
 ];
 
 export default function StatsPage() {
-  const { user, profile, login, backendReady } = useAuth();
-  const now = useQuoteClock();
-  const experience = getProfileExperience(profile, now);
+  const { user, profile, login } = useAuth();
+  const experience = getProfileExperience(profile);
   const [completedCount, setCompletedCount] = useState(0);
   const [recentCompleted, setRecentCompleted] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user || !backendReady) return;
+    if (!user) return;
     const fetchStats = async () => {
       try {
         const res = await client.entities.tasks.query({
           query: { status: 'completed' },
           sort: '-completed_at',
-          limit: 100,
+          limit: 50,
         });
         const items = res?.data?.items || [];
         setCompletedCount(items.length);
-        setRecentCompleted(items); // Keep more for the timeline check
+        setRecentCompleted(items.slice(0, 7));
       } catch (err) {
         console.error(err);
       }
     };
     fetchStats();
-  }, [user, backendReady]);
+  }, [user]);
 
   const level = profile?.level || 1;
   const xp = profile?.xp || 0;
@@ -56,30 +55,16 @@ export default function StatsPage() {
 
   // Generate last 7 days for streak calendar
   const last7Days = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
-      d.setHours(0, 0, 0, 0);
-
-      const isToday = d.getTime() === today.getTime();
-      const hasCompleted = recentCompleted.some(task => {
-        if (!task.completed_at) return false;
-        const taskDate = new Date(task.completed_at);
-        taskDate.setHours(0, 0, 0, 0);
-        return taskDate.getTime() === d.getTime();
-      });
-
       return {
         day: d.toLocaleDateString('en', { weekday: 'short' }),
         date: d.getDate(),
-        active: hasCompleted,
-        isToday,
+        active: i >= 7 - streak,
       };
     });
-  }, [recentCompleted]);
+  }, [streak]);
 
   if (!user) {
     return (
@@ -107,7 +92,7 @@ export default function StatsPage() {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 mb-1.5">
             {experience.personality.label} • {experience.mood.label}
           </p>
-          <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.statsReflection}</p>
+          <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.dashboardGreeting}</p>
         </Card>
 
         {/* Level & XP */}
@@ -194,26 +179,15 @@ export default function StatsPage() {
           <div className="grid grid-cols-7 gap-2">
             {last7Days.map((day, i) => (
               <div key={i} className="text-center space-y-2">
-                <p className={`text-[9px] font-black uppercase tracking-widest ${day.isToday ? 'text-primary drop-shadow-sm' : 'text-foreground/40'}`}>
-                  {day.day}
-                </p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-foreground/40">{day.day}</p>
                 <div
-                  className={`w-9 h-9 rounded-2xl mx-auto flex items-center justify-center text-[11px] font-black transition-all relative ${
+                  className={`w-9 h-9 rounded-2xl mx-auto flex items-center justify-center text-[11px] font-black transition-all shadow-lg ${
                     day.active
-                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
-                      : 'glass text-foreground/40 border-white/5 bg-white/5'
-                  } ${day.isToday && !day.active ? 'border-primary/50 border-2' : ''}`}
+                      ? 'bg-primary text-primary-foreground shadow-primary/20 scale-105'
+                      : 'glass text-foreground/30 border-white/5 opacity-40'
+                  }`}
                 >
                   {day.date}
-                  {day.isToday && (
-                    <div className="absolute -top-1.5 -right-1.5 animate-pulse">
-                      {day.active ? (
-                        <Flame className="w-4 h-4 text-orange-500 fill-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
-                      ) : (
-                        <div className="w-2.5 h-2.5 bg-primary rounded-full border-2 border-background" />
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
@@ -248,10 +222,10 @@ export default function StatsPage() {
 
         {/* Recent Completed */}
         {recentCompleted.length > 0 && (
-          <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6 font-premium">
+          <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground mb-4 drop-shadow-sm">Tactical Log</h3>
             <div className="space-y-3">
-              {recentCompleted.slice(0, 7).map((task: any) => (
+              {recentCompleted.map((task: any) => (
                 <div key={task.id} className="flex items-center gap-4 text-sm glass p-3.5 rounded-2xl border-white/10 group hover:border-white/30 transition-all shadow-md">
                   <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 transition-transform">
                     <CheckCircle2 className="w-4.5 h-4.5" />

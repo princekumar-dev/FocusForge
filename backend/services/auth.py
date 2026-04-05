@@ -8,10 +8,8 @@ from core.auth import create_access_token
 from core.config import settings
 from core.database import db_manager
 from models.auth import OIDCState, User
-from models.user_profiles import User_profiles
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -20,48 +18,19 @@ class AuthService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    @staticmethod
-    def _normalize_identity(value: Optional[str]) -> str:
-        return str(value or "").strip()
-
-    @staticmethod
-    def _normalize_email(email: Optional[str]) -> str:
-        return str(email or "").strip().lower()
-
     async def get_or_create_user(self, platform_sub: str, email: str, name: Optional[str] = None) -> User:
         """Get existing user or create new one."""
         start_time = time.time()
-        platform_sub = self._normalize_identity(platform_sub)
-        email = self._normalize_email(email)
-
-        if not platform_sub:
-            raise ValueError("platform_sub is required")
-
         logger.debug(f"[DB_OP] Starting get_or_create_user - platform_sub: {platform_sub}")
-
-        # Try to find the exact upstream identity first.
+        # Try to find existing user
         result = await self.db.execute(select(User).where(User.id == platform_sub))
         user = result.scalar_one_or_none()
         logger.debug(f"[DB_OP] User lookup completed in {time.time() - start_time:.4f}s - found: {user is not None}")
 
-        # Fall back to email so older records can be re-linked instead of
-        # creating a duplicate account when identity providers or token formats change.
-        if not user and email:
-            result = await self.db.execute(select(User).where(User.email == email))
-            user = result.scalar_one_or_none()
-            if user and user.id != platform_sub:
-                previous_user_id = user.id
-                logger.info("Relinking user account from %s to %s based on email match", previous_user_id, platform_sub)
-                await self.db.execute(
-                    update(User_profiles).where(User_profiles.user_id == previous_user_id).values(user_id=platform_sub)
-                )
-                user.id = platform_sub
-
         if user:
             # Update user info if needed
             user.email = email
-            if name:
-                user.name = name
+            user.name = name
             user.last_login = datetime.now(timezone.utc)
         else:
             # Create new user
@@ -70,13 +39,7 @@ class AuthService:
 
         start_time_commit = time.time()
         logger.debug("[DB_OP] Starting user commit/refresh")
-        try:
-            await self.db.commit()
-        except IntegrityError:
-            await self.db.rollback()
-            logger.warning("Concurrent user creation detected for platform_sub=%s; reloading existing user", platform_sub)
-            result = await self.db.execute(select(User).where(User.id == platform_sub))
-            user = result.scalar_one()
+        await self.db.commit()
         await self.db.refresh(user)
         logger.debug(f"[DB_OP] User commit/refresh completed in {time.time() - start_time_commit:.4f}s")
         return user
