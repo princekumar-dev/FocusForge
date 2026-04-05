@@ -77,6 +77,9 @@ function isTokenFresh(): boolean {
   return age < TOKEN_REFRESH_INTERVAL_MS;
 }
 
+// Key used to track the last date energy was reset (format: YYYY-MM-DD).
+const ENERGY_RESET_KEY = 'last_energy_reset';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const { getToken } = useClerkAuth();
@@ -185,6 +188,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         setProfile(existing);
+
+        // ── Daily energy reset ──────────────────────────────────────
+        // Check if today's date differs from the last reset date.
+        // If so, refill energy to max and record today's date.
+        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        const lastReset = localStorage.getItem(ENERGY_RESET_KEY);
+        if (lastReset !== today && existing.energy < (existing.max_energy || 100)) {
+          const maxEnergy = existing.max_energy || 100;
+          try {
+            const resetRes = await client.entities.user_profiles.update({
+              id: String(existing.id),
+              data: { energy: maxEnergy },
+            });
+            if (resetRes?.data) {
+              setProfile(resetRes.data as UserProfile);
+            }
+          } catch {
+            // Reset failed — not critical, will retry on next load.
+          }
+          localStorage.setItem(ENERGY_RESET_KEY, today);
+        } else if (!lastReset) {
+          // First time — just record today so tomorrow triggers a reset.
+          localStorage.setItem(ENERGY_RESET_KEY, today);
+        }
+
         return;
       }
 
