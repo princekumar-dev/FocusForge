@@ -1,0 +1,11 @@
+services:
+  - name: backend
+    type: web
+    env: docker
+    dockerfilePath: backend/Dockerfile
+
+  - name: frontend
+    type: static
+    env: static
+    buildCommand: "cd frontend && corepack enable && corepack prepare pnpm@8.10.0 --activate && pnpm install && pnpm run build"
+    publishPath: frontend/dist
