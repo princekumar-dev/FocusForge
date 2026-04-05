@@ -30,11 +30,11 @@ export default function StatsPage() {
         const res = await client.entities.tasks.query({
           query: { status: 'completed' },
           sort: '-completed_at',
-          limit: 50,
+          limit: 100,
         });
         const items = res?.data?.items || [];
         setCompletedCount(items.length);
-        setRecentCompleted(items.slice(0, 7));
+        setRecentCompleted(items); // Keep more for the timeline check
       } catch (err) {
         console.error(err);
       }
@@ -55,16 +55,30 @@ export default function StatsPage() {
 
   // Generate last 7 days for streak calendar
   const last7Days = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
+      d.setHours(0, 0, 0, 0);
+
+      const isToday = d.getTime() === today.getTime();
+      const hasCompleted = recentCompleted.some(task => {
+        if (!task.completed_at) return false;
+        const taskDate = new Date(task.completed_at);
+        taskDate.setHours(0, 0, 0, 0);
+        return taskDate.getTime() === d.getTime();
+      });
+
       return {
         day: d.toLocaleDateString('en', { weekday: 'short' }),
         date: d.getDate(),
-        active: i >= 7 - streak,
+        active: hasCompleted,
+        isToday,
       };
     });
-  }, [streak]);
+  }, [recentCompleted]);
 
   if (!user) {
     return (
@@ -179,15 +193,20 @@ export default function StatsPage() {
           <div className="grid grid-cols-7 gap-2">
             {last7Days.map((day, i) => (
               <div key={i} className="text-center space-y-2">
-                <p className="text-[9px] font-black uppercase tracking-widest text-foreground/40">{day.day}</p>
+                <p className={`text-[9px] font-black uppercase tracking-widest ${day.isToday ? 'text-primary drop-shadow-sm' : 'text-foreground/40'}`}>
+                  {day.day}
+                </p>
                 <div
-                  className={`w-9 h-9 rounded-2xl mx-auto flex items-center justify-center text-[11px] font-black transition-all shadow-lg ${
+                  className={`w-9 h-9 rounded-2xl mx-auto flex items-center justify-center text-[11px] font-black transition-all relative ${
                     day.active
-                      ? 'bg-primary text-primary-foreground shadow-primary/20 scale-105'
-                      : 'glass text-foreground/30 border-white/5 opacity-40'
-                  }`}
+                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105'
+                      : 'glass text-foreground/40 border-white/5 bg-white/5'
+                  } ${day.isToday && !day.active ? 'border-primary/50 border-2' : ''}`}
                 >
                   {day.date}
+                  {day.isToday && (
+                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
+                  )}
                 </div>
               </div>
             ))}
@@ -222,10 +241,10 @@ export default function StatsPage() {
 
         {/* Recent Completed */}
         {recentCompleted.length > 0 && (
-          <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6">
+          <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6 font-premium">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground mb-4 drop-shadow-sm">Tactical Log</h3>
             <div className="space-y-3">
-              {recentCompleted.map((task: any) => (
+              {recentCompleted.slice(0, 7).map((task: any) => (
                 <div key={task.id} className="flex items-center gap-4 text-sm glass p-3.5 rounded-2xl border-white/10 group hover:border-white/30 transition-all shadow-md">
                   <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 transition-transform">
                     <CheckCircle2 className="w-4.5 h-4.5" />
