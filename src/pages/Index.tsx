@@ -209,15 +209,15 @@ export default function DashboardPage() {
             </div>
             <span className="text-xs font-black uppercase tracking-widest text-foreground/70 drop-shadow-sm">{xp} / {xpNeeded} XP</span>
           </div>
-          <div className="relative h-4 bg-white/10 rounded-full border border-white/5 mt-1">
+          <div className="relative h-5 bg-white/10 rounded-full border border-white/5 mt-1">
             <div 
               className="absolute inset-y-0 left-0 bg-primary transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(var(--primary),0.3)]"
               style={{ transform: `translate3d(0, 0, 0)`, width: `${xpPercent}%` }}
             />
             {/* Avatar Caret */}
             <div 
-              className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10 animate-float-subtle"
-              style={{ transform: `translate3d(${xpPercent}%, -50%, 0)`, left: `-8px` }}
+              className="absolute top-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10"
+              style={{ left: `${xpPercent}%`, transform: `translate3d(-50%, -50%, 0)` }}
               onClick={() => playAvatarSound(profile?.avatar || '🌱')}
             >
               {profile?.avatar || '🌱'}
@@ -274,15 +274,15 @@ export default function DashboardPage() {
             </span>
             <span className="text-xs font-black text-foreground/80 tracking-widest uppercase">{energy}/{maxEnergy}</span>
           </div>
-          <div className="relative h-4 bg-white/10 rounded-full border border-white/5 mt-1">
+          <div className="relative h-5 bg-white/10 rounded-full border border-white/5 mt-1">
             <div 
               className="absolute inset-y-0 left-0 bg-yellow-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(234,179,8,0.3)]"
               style={{ transform: `translate3d(0, 0, 0)`, width: `${energyPercent}%` }}
             />
             {/* Avatar Caret */}
             <div 
-              className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10 animate-float-subtle"
-              style={{ transform: `translate3d(${energyPercent}%, -50%, 0)`, left: `-8px` }}
+              className="absolute top-1/2 transition-all duration-1000 ease-out text-base active:scale-125 hover:scale-110 cursor-pointer drop-shadow-md z-10"
+              style={{ left: `${energyPercent}%`, transform: `translate3d(-50%, -50%, 0)` }}
               onClick={() => playAvatarSound(profile?.avatar || '🌱')}
             >
               {profile?.avatar || '🌱'}
