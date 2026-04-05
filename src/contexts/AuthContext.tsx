@@ -59,6 +59,27 @@ const DEFAULT_PROFILE: Omit<UserProfile, 'id' | 'user_id'> = {
   focus_minutes: 0,
 };
 
+function scoreProfile(profile: UserProfile): number {
+  let score = 0;
+
+  score += (profile.total_xp || 0) * 1000;
+  score += (profile.tasks_completed || 0) * 100;
+  score += (profile.focus_minutes || 0) * 10;
+  score += (profile.level || 0) * 100;
+  score += profile.id || 0;
+
+  if (profile.display_name && profile.display_name !== DEFAULT_PROFILE.display_name) score += 25;
+  if (profile.avatar && profile.avatar !== DEFAULT_PROFILE.avatar) score += 10;
+  if (profile.personality_mode && profile.personality_mode !== DEFAULT_PROFILE.personality_mode) score += 5;
+  if (profile.mood && profile.mood !== DEFAULT_PROFILE.mood) score += 5;
+
+  return score;
+}
+
+function pickCanonicalProfile(profiles: UserProfile[]): UserProfile {
+  return profiles.reduce((best, current) => (scoreProfile(current) > scoreProfile(best) ? current : best));
+}
+
 // How often to proactively refresh the backend token (50 minutes).
 // This ensures the token is refreshed well before a typical 60-minute expiry.
 const TOKEN_REFRESH_INTERVAL_MS = 50 * 60 * 1000;
@@ -207,11 +228,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await client.entities.user_profiles.query({
         query: { user_id: clerkUser.id },
-        limit: 1,
+        sort: '-id',
+        limit: 50,
       });
       const items = res?.data?.items;
       if (items && items.length > 0) {
-        const existing = items[0] as UserProfile;
+        let existing = pickCanonicalProfile(items as UserProfile[]);
 
         // Auto-fix "Adventurer" display name if Clerk now has the real name.
         // This handles the case where a profile was previously created before
@@ -224,8 +246,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               data: { display_name: realName },
             });
             if (updateRes?.data) {
-              setProfile(updateRes.data as UserProfile);
-              return;
+              existing = updateRes.data as UserProfile;
             }
           } catch {
             // Name update failed — use profile as-is, don't block login.
@@ -279,7 +300,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
       if (createRes?.data) {
-        setProfile(createRes.data as UserProfile);
+        const normalizedProfile = await ensureDailyEnergyReset(createRes.data as UserProfile);
+        setProfile(normalizedProfile);
       }
     } catch (err) {
       // Query itself failed (401, network error, etc.)
