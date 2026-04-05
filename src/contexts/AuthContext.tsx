@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useAuth as useClerkAuth, useClerk, useUser } from '@clerk/clerk-react';
 import { client } from '../lib/api';
 
@@ -32,6 +32,7 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  backendReady: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -58,6 +59,24 @@ const DEFAULT_PROFILE: Omit<UserProfile, 'id' | 'user_id'> = {
   focus_minutes: 0,
 };
 
+// How often to proactively refresh the backend token (50 minutes).
+// This ensures the token is refreshed well before a typical 60-minute expiry.
+const TOKEN_REFRESH_INTERVAL_MS = 50 * 60 * 1000;
+
+// Key used to store the timestamp (ms) when the backend token was last obtained.
+const TOKEN_TIMESTAMP_KEY = 'token_obtained_at';
+
+/**
+ * Returns true if the stored backend token is likely still valid.
+ * We consider it valid if it was obtained less than TOKEN_REFRESH_INTERVAL_MS ago.
+ */
+function isTokenFresh(): boolean {
+  const obtainedAt = localStorage.getItem(TOKEN_TIMESTAMP_KEY);
+  if (!obtainedAt) return false;
+  const age = Date.now() - Number(obtainedAt);
+  return age < TOKEN_REFRESH_INTERVAL_MS;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const { getToken } = useClerkAuth();
@@ -65,6 +84,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [backendReady, setBackendReady] = useState(false);
+
+  // Ref to track whether a token exchange is already in progress to avoid races.
+  const exchangeInProgress = useRef(false);
+  // Ref for the periodic refresh timer so we can clean it up.
+  const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const user: User | null = clerkUser
     ? {
@@ -74,6 +98,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     : null;
 
+  // ─── Token exchange helper ────────────────────────────────────────────
+  // Silently exchanges the current Clerk session token for a backend token.
+  // Returns true on success, false on failure.
+  const doTokenExchange = useCallback(async (): Promise<boolean> => {
+    if (!clerkUser) return false;
+    if (exchangeInProgress.current) return false;
+
+    exchangeInProgress.current = true;
+    try {
+      const clerkToken = await getToken();
+      if (!clerkToken) {
+        console.warn('[Auth] Clerk token unavailable for backend exchange');
+        return false;
+      }
+
+      const response = await fetch('/api/v1/auth/clerk/exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clerk_token: clerkToken,
+          email: clerkUser.primaryEmailAddress?.emailAddress ?? '',
+          name: clerkUser.fullName ?? clerkUser.firstName ?? clerkUser.username ?? '',
+        }),
+      });
+
+      if (!response.ok) {
+        console.error(`[Auth] Backend token exchange failed (${response.status})`);
+        return false;
+      }
+
+      const data = (await response.json()) as { token: string };
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('token_user_id', clerkUser.id);
+      localStorage.setItem(TOKEN_TIMESTAMP_KEY, String(Date.now()));
+      return true;
+    } catch (err) {
+      console.error('[Auth] Token exchange error:', err);
+      return false;
+    } finally {
+      exchangeInProgress.current = false;
+    }
+  }, [clerkUser, getToken]);
+
+  // ─── Profile helpers ──────────────────────────────────────────────────
   const fetchProfile = useCallback(async () => {
     if (!clerkUser) {
       setProfile(null);
@@ -108,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(createRes.data as UserProfile);
       }
     } catch (err) {
-      console.error('Failed to fetch profile:', err);
+      console.error('[Auth] Failed to fetch profile:', err);
     } finally {
       setProfileLoading(false);
     }
@@ -120,9 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = useCallback(
     async (data: Partial<UserProfile>) => {
-      if (!profile) {
-        return;
-      }
+      if (!profile) return;
       try {
         const res = await client.entities.user_profiles.update({
           id: String(profile.id),
@@ -132,75 +198,99 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setProfile(res.data as UserProfile);
         }
       } catch (err) {
-        console.error('Failed to update profile:', err);
+        console.error('[Auth] Failed to update profile:', err);
       }
     },
     [profile]
   );
 
+  // ─── Initial token acquisition ────────────────────────────────────────
   useEffect(() => {
-    if (!isLoaded) {
-      return;
-    }
+    if (!isLoaded) return;
 
     if (!isSignedIn) {
       localStorage.removeItem('token');
       localStorage.removeItem('token_user_id');
+      localStorage.removeItem(TOKEN_TIMESTAMP_KEY);
       setBackendReady(true);
       return;
     }
 
-    if (!clerkUser) {
-      return;
-    }
+    if (!clerkUser) return;
 
+    // If we already have a fresh token for this user, skip exchange.
     const existingToken = localStorage.getItem('token');
     const existingTokenUserId = localStorage.getItem('token_user_id');
-    if (existingToken && existingTokenUserId === clerkUser.id) {
+    if (existingToken && existingTokenUserId === clerkUser.id && isTokenFresh()) {
       setBackendReady(true);
       return;
     }
 
-    const exchangeToken = async () => {
-      try {
-        const clerkToken = await getToken();
-        if (!clerkToken) {
-          console.error('Clerk token was not available for backend exchange');
-          return;
-        }
-
-        const response = await fetch('/api/v1/auth/clerk/exchange', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            clerk_token: clerkToken,
-            email: clerkUser.primaryEmailAddress?.emailAddress ?? '',
-            name: clerkUser.fullName ?? clerkUser.firstName ?? clerkUser.username ?? '',
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Backend token exchange failed with status ${response.status}`);
-        }
-
-        const data = (await response.json()) as { token: string };
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('token_user_id', clerkUser.id);
-        window.location.reload();
-      } catch (err) {
-        console.error('Failed to exchange Clerk token for backend token:', err);
+    // Token is missing, stale, or for a different user — exchange silently.
+    const initExchange = async () => {
+      const ok = await doTokenExchange();
+      if (ok) {
+        setBackendReady(true);
+      } else {
+        // Even if the exchange fails, mark backend as ready so the UI
+        // doesn't hang forever. The periodic refresh will retry shortly.
+        console.warn('[Auth] Initial token exchange failed — will retry');
+        setBackendReady(true);
       }
     };
 
-    void exchangeToken();
-  }, [clerkUser, getToken, isLoaded, isSignedIn]);
+    void initExchange();
+  }, [clerkUser, doTokenExchange, isLoaded, isSignedIn]);
 
+  // ─── Periodic token refresh ───────────────────────────────────────────
+  // Re-exchanges the token every TOKEN_REFRESH_INTERVAL_MS so the backend
+  // token never expires while the app is open.
   useEffect(() => {
-    if (!isLoaded || !backendReady) {
+    if (!isLoaded || !isSignedIn || !clerkUser || !backendReady) {
+      // Clean up any existing timer if user signs out.
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
       return;
     }
+
+    refreshTimerRef.current = setInterval(() => {
+      console.log('[Auth] Proactive token refresh');
+      void doTokenExchange();
+    }, TOKEN_REFRESH_INTERVAL_MS);
+
+    return () => {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
+    };
+  }, [backendReady, clerkUser, doTokenExchange, isLoaded, isSignedIn]);
+
+  // ─── Visibility-change refresh ────────────────────────────────────────
+  // When the user returns to a tab that was backgrounded (e.g. after sleep,
+  // switching tabs, or locking the screen), check if the token is stale and
+  // refresh it immediately.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !clerkUser || !backendReady) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !isTokenFresh()) {
+        console.log('[Auth] Tab became visible with stale token — refreshing');
+        void doTokenExchange();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [backendReady, clerkUser, doTokenExchange, isLoaded, isSignedIn]);
+
+  // ─── Fetch profile once backend is ready ──────────────────────────────
+  useEffect(() => {
+    if (!isLoaded || !backendReady) return;
 
     if (!isSignedIn || !clerkUser) {
       setProfile(null);
@@ -211,6 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void fetchProfile();
   }, [backendReady, clerkUser, fetchProfile, isLoaded, isSignedIn]);
 
+  // ─── Login / Logout ───────────────────────────────────────────────────
   const login = useCallback(async () => {
     window.location.href = '/sign-in';
   }, []);
@@ -219,13 +310,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
     localStorage.removeItem('token');
     localStorage.removeItem('token_user_id');
+    localStorage.removeItem(TOKEN_TIMESTAMP_KEY);
     await clerk.signOut({ redirectUrl: window.location.origin + '/' });
   }, [clerk]);
 
   const loading = !isLoaded || !backendReady || (isSignedIn && profileLoading);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout, refreshProfile, updateProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, backendReady, login, logout, refreshProfile, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

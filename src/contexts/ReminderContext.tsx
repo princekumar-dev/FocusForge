@@ -11,7 +11,7 @@ interface ReminderContextType {
 const ReminderContext = createContext<ReminderContextType | null>(null);
 
 export function ReminderProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, backendReady } = useAuth();
   const [alertTask, setAlertTask] = useState<any | null>(null);
   const notified10m = useRef<Set<number>>(new Set());
   const notified2m = useRef<Set<number>>(new Set());
@@ -75,7 +75,7 @@ export function ReminderProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !backendReady) return;
     requestPermission();
 
     const checkTasks = async () => {
@@ -120,7 +120,7 @@ export function ReminderProvider({ children }: { children: React.ReactNode }) {
     checkTasks();
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, backendReady]);
 
   return (
     <ReminderContext.Provider value={{ alertTask, dismissAlert }}>
