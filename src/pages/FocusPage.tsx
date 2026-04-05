@@ -48,7 +48,7 @@ export default function FocusPage() {
 
   const now = useQuoteClock();
   const experience = getProfileExperience(profile, now);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   const { play, stop } = useAmbientSound();
 
@@ -111,14 +111,19 @@ export default function FocusPage() {
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
+      timerRef.current = window.setInterval(() => {
         setLeft(t => t - 1);
-        console.log('Timer heartbeat:', timeLeft);
+        console.log('Timer heartbeat');
       }, 1000);
     } else if (timeLeft === 0) {
       completeSession();
     }
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [isRunning, timeLeft, completeSession]);
 
   const changeDuration = (val: string) => {
