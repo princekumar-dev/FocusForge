@@ -2,7 +2,7 @@
   "name": "focusforge",
   "type": "module",
   "engines": {
-    "node": "24.x"
+    "node": "22.x"
   },
   "packageManager": "pnpm@10.27.0",
   "scripts": {
