@@ -15,8 +15,13 @@ const defaultConfig = {
 export async function loadRuntimeConfig(): Promise<void> {
   try {
     console.log('🔧 DEBUG: Starting to load runtime config...');
-    // Try to load configuration from a config endpoint
-    const response = await fetch('/api/config');
+    // Determine config endpoint. Prefer backend URL when provided (production),
+    // otherwise fall back to a same-origin `/api/config` path (dev or lambda).
+    const base = import.meta.env.VITE_API_BASE_URL
+      ? String(import.meta.env.VITE_API_BASE_URL).replace(/\/$/, '')
+      : '';
+    const configEndpoint = base ? `${base}/api/config` : '/api/config';
+    const response = await fetch(configEndpoint);
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       // Only parse as JSON if the response is actually JSON
