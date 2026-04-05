@@ -107,7 +107,7 @@ export default function StatsPage() {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 mb-1.5">
             {experience.personality.label} • {experience.mood.label}
           </p>
-          <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.dashboardGreeting}</p>
+          <p className="text-sm font-black text-foreground drop-shadow-sm leading-relaxed">{experience.statsReflection}</p>
         </Card>
 
         {/* Level & XP */}
