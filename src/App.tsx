@@ -3,6 +3,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ReminderProvider } from './contexts/ReminderContext';
+import { ReminderAlert } from './components/ReminderAlert';
 import { ThemeProvider } from 'next-themes';
 import Index from './pages/Index';
 import TasksPage from './pages/TasksPage';
@@ -21,29 +23,32 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light">
       <AuthProvider>
-        <TooltipProvider>
-          <div className="mesh-gradient" />
-          <Toaster />
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/tasks" element={<TasksPage />} />
-              <Route path="/focus" element={<FocusPage />} />
-              <Route path="/stats" element={<StatsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/sign-in/*" element={<SignInPage />} />
-              <Route path="/sign-up/*" element={<SignUpPage />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/auth/error" element={<AuthError />} />
-              <Route path="/logout-callback" element={<LogoutCallbackPage />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <ReminderProvider>
+          <TooltipProvider>
+            <div className="mesh-gradient" />
+            <Toaster />
+            <ReminderAlert />
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/tasks" element={<TasksPage />} />
+                <Route path="/focus" element={<FocusPage />} />
+                <Route path="/stats" element={<StatsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/sign-in/*" element={<SignInPage />} />
+                <Route path="/sign-up/*" element={<SignUpPage />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/error" element={<AuthError />} />
+                <Route path="/logout-callback" element={<LogoutCallbackPage />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ReminderProvider>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
