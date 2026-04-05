@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
-import { getProfileExperience } from '@/lib/profileExperience';
+import { getProfileExperience, getTimeGreeting, useQuoteClock } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -45,17 +45,15 @@ const priorityColor = (p: string) => {
   }
 };
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'morning';
-  if (hour < 17) return 'afternoon';
-  return 'evening';
+function getGreeting(now: Date = new Date()) {
+  return getTimeGreeting(now);
 }
 
 export default function DashboardPage() {
   const { user, profile, loading, login, refreshProfile, updateProfile, backendReady } = useAuth();
   const { playAvatarSound } = useAvatarSound();
-  const experience = getProfileExperience(profile);
+  const now = useQuoteClock();
+  const experience = getProfileExperience(profile, now);
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState<Task[]>([]);

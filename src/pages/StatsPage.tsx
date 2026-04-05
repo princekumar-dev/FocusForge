@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
-import { getProfileExperience } from '@/lib/profileExperience';
+import { getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,8 @@ const TREE_IMAGES = [
 
 export default function StatsPage() {
   const { user, profile, login, backendReady } = useAuth();
-  const experience = getProfileExperience(profile);
+  const now = useQuoteClock();
+  const experience = getProfileExperience(profile, now);
   const [completedCount, setCompletedCount] = useState(0);
   const [recentCompleted, setRecentCompleted] = useState<any[]>([]);
 

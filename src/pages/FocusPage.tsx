@@ -4,7 +4,7 @@ import { client } from '@/lib/api';
 import { useAmbientSound, type AmbientPreset } from '@/hooks/useAmbientSound';
 import { useAvatarSound } from '@/hooks/useAvatarSound';
 
-import { getAmbientPresetLabel, getProfileExperience } from '@/lib/profileExperience';
+import { getAmbientPresetLabel, getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +46,8 @@ export default function FocusPage() {
   const [ambientPreset, setAmbientPreset] = useState<AmbientPreset>('focus');
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const experience = getProfileExperience(profile);
+  const now = useQuoteClock();
+  const experience = getProfileExperience(profile, now);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { play, stop } = useAmbientSound();

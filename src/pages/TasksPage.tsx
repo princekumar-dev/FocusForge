@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
-import { getProfileExperience } from '@/lib/profileExperience';
+import { getProfileExperience, useQuoteClock } from '@/lib/profileExperience';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,7 +38,8 @@ interface Task {
 export default function TasksPage() {
   const { user, profile, login, updateProfile, backendReady } = useAuth();
   const { playAvatarSound } = useAvatarSound();
-  const experience = getProfileExperience(profile);
+  const now = useQuoteClock();
+  const experience = getProfileExperience(profile, now);
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
