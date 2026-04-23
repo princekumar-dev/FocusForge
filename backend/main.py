@@ -98,6 +98,13 @@ app.add_middleware(
 # MODULE_MIDDLEWARE_END
 
 
+@app.middleware("http")
+async def handle_uptime_head_requests(request: Request, call_next):
+    if request.method == "HEAD" and request.url.path in {"/", "/health"}:
+        return Response(status_code=200)
+    return await call_next(request)
+
+
 # Auto-discover and include all routers from the local `routers` package
 def include_routers_from_package(app: FastAPI, package_name: str = "routers") -> None:
     """Discover and include all APIRouter objects from a package.
