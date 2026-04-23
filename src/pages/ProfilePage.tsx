@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import BottomNav from '@/components/BottomNav';
+import LivingAvatar from '@/components/LivingAvatar';
 import { LogOut, User, Smile, Brain, Snowflake, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAvatarSound } from '@/hooks/useAvatarSound';
@@ -195,8 +196,12 @@ export default function ProfilePage() {
         <Card className="glass p-6 rounded-[2.5rem] border-white/20 mb-6 relative overflow-hidden">
            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50 pointer-events-none" />
           <div className="flex items-center gap-6 relative z-10">
-            <div className="w-20 h-20 rounded-[1.5rem] glass flex items-center justify-center text-4xl shadow-2xl border border-white/30 transition-transform hover:scale-105 active:scale-95">
-              {profile?.avatar || '🌱'}
+            <div className="w-20 h-20 rounded-[1.5rem] glass flex items-center justify-center shadow-2xl border border-white/30 transition-transform hover:scale-105 active:scale-95 overflow-hidden">
+              <LivingAvatar
+                avatar={profile?.avatar || '🌱'}
+                className="w-full h-full"
+                emojiClassName="text-4xl"
+              />
             </div>
             <div className="flex-1 space-y-1">
               {editName ? (

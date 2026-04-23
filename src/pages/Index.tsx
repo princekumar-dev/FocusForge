@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import BottomNav from '@/components/BottomNav';
 import ConfettiEffect from '@/components/ConfettiEffect';
+import LivingAvatar from '@/components/LivingAvatar';
 import {
   Flame, Zap, Trophy, Target, ChevronRight, Plus, Sparkles, LogIn,
 } from 'lucide-react';
@@ -199,9 +200,13 @@ export default function DashboardPage() {
               playAvatarSound(profile?.avatar || '🌱');
               navigate('/profile');
             }}
-            className="w-12 h-12 rounded-full glass shadow-lg flex items-center justify-center text-2xl transition-all hover:scale-110 active:scale-95 border-white/20"
+            className="w-16 h-16 rounded-full glass shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-white/20 relative overflow-hidden"
           >
-            {profile?.avatar || '🌱'}
+            <LivingAvatar
+              avatar={profile?.avatar || '🌱'}
+              className="w-full h-full"
+              emojiClassName="text-[1.9rem]"
+            />
           </button>
 
         </div>

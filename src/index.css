@@ -263,3 +263,86 @@ body {
 .font-premium {
   @apply font-black tracking-tight;
 }
+
+@keyframes avatar-core-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -5px, 0) scale(1.03); }
+}
+
+@keyframes avatar-halo-spin {
+  from { transform: rotate(0deg) scale(0.92); opacity: 0.45; }
+  to { transform: rotate(360deg) scale(1.04); opacity: 0.85; }
+}
+
+@keyframes avatar-orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes avatar-whisper-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+@keyframes avatar-ghost-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(6px, -10px, 0); }
+  50% { transform: translate3d(-4px, -18px, 0); }
+  75% { transform: translate3d(8px, -10px, 0); }
+}
+
+.avatar-core {
+  animation: avatar-core-float 3.8s ease-in-out infinite;
+}
+
+.avatar-halo {
+  animation: avatar-halo-spin 10s linear infinite;
+}
+
+.avatar-orbit {
+  position: absolute;
+  inset: -10%;
+  animation: avatar-orbit-spin 9s linear infinite;
+}
+
+.avatar-orbit-fast {
+  animation-duration: 6.2s;
+  animation-direction: reverse;
+}
+
+.avatar-orbit-slow {
+  animation-duration: 10.5s;
+}
+
+.avatar-orbit-dot {
+  display: block;
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 9999px;
+  margin-left: auto;
+  box-shadow: 0 0 14px rgba(255,255,255,0.22);
+}
+
+.avatar-orbit-dot-sm {
+  width: 0.34rem;
+  height: 0.34rem;
+  opacity: 0.8;
+}
+
+.avatar-whisper-float {
+  animation: avatar-whisper-float 5.2s ease-in-out infinite;
+}
+
+.avatar-ghost-drift {
+  animation: avatar-ghost-drift 8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-core,
+  .avatar-halo,
+  .avatar-orbit,
+  .avatar-whisper-float,
+  .avatar-ghost-drift {
+    animation: none !important;
+  }
+}
