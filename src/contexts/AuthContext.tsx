@@ -6,6 +6,7 @@ export interface User {
   id: string;
   email?: string;
   name?: string;
+  role?: string;
 }
 
 export interface UserProfile {
@@ -32,6 +33,8 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  backendReady: boolean;
+  isAdmin: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -76,11 +79,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profileLoading, setProfileLoading] = useState(false);
   const [backendReady, setBackendReady] = useState(false);
 
+  const role =
+    clerkUser && typeof clerkUser.publicMetadata?.role === 'string'
+      ? clerkUser.publicMetadata.role
+      : 'user';
+
   const user: User | null = clerkUser
     ? {
         id: clerkUser.id,
         email: clerkUser.primaryEmailAddress?.emailAddress,
         name: clerkUser.fullName ?? clerkUser.firstName ?? clerkUser.username ?? undefined,
+        role,
       }
     : null;
 
@@ -229,9 +238,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clerk]);
 
   const loading = !isLoaded || !backendReady || (isSignedIn && profileLoading);
+  const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout, refreshProfile, updateProfile }}>
+    <AuthContext.Provider
+      value={{ user, profile, loading, backendReady, isAdmin, login, logout, refreshProfile, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );
