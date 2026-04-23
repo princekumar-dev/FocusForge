@@ -9,7 +9,7 @@ from datetime import datetime
 from core.config import settings
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.routing import APIRouter
 
 # MODULE_IMPORTS_START
@@ -190,9 +190,19 @@ def root():
     return {"message": "FastAPI Modular Template is running"}
 
 
+@app.head("/")
+def root_head():
+    return Response(status_code=200)
+
+
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+
+@app.head("/health")
+def health_check_head():
+    return Response(status_code=200)
 
 
 def run_in_debug_mode(app: FastAPI):
