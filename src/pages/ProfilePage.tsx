@@ -27,19 +27,37 @@ const MOODS = [
   { id: 'overwhelmed', label: 'Overwhelmed', emoji: '😰', desc: 'Take it easy' },
 ];
 
+function getFallbackProfileName(
+  displayName?: string,
+  authName?: string,
+  authEmail?: string
+): string {
+  const safeDisplayName = (displayName ?? '').trim();
+  if (safeDisplayName) return safeDisplayName;
+
+  const safeAuthName = (authName ?? '').trim();
+  if (safeAuthName) return safeAuthName;
+
+  const emailLocalPart = (authEmail ?? '').split('@')[0]?.trim() ?? '';
+  if (emailLocalPart) return emailLocalPart;
+
+  return 'Adventurer';
+}
+
 export default function ProfilePage() {
   const { user, profile, login, logout, updateProfile } = useAuth();
   const { playAvatarSound } = useAvatarSound();
   const [editName, setEditName] = useState(false);
 
-  const [nameValue, setNameValue] = useState(profile?.display_name || '');
+  const effectiveProfileName = getFallbackProfileName(profile?.display_name, user?.name, user?.email);
+  const [nameValue, setNameValue] = useState(effectiveProfileName);
   const { theme, setTheme } = useTheme();
   const darkMode = theme === 'dark';
   const experience = useMemo(() => getProfileExperience(profile), [profile]);
 
   useEffect(() => {
-    setNameValue(profile?.display_name || '');
-  }, [profile?.display_name]);
+    setNameValue(getFallbackProfileName(profile?.display_name, user?.name, user?.email));
+  }, [profile?.display_name, user?.name, user?.email]);
 
   const toggleDarkMode = (checked: boolean) => {
     setTheme(checked ? 'dark' : 'light');
@@ -193,9 +211,9 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="space-y-0.5">
-                  <h2 className="text-3xl font-black tracking-tighter text-foreground drop-shadow-sm">{profile?.display_name || 'Adventurer'}</h2>
+                  <h2 className="text-3xl font-black tracking-tighter text-foreground drop-shadow-sm">{effectiveProfileName}</h2>
                   <button
-                    onClick={() => { setNameValue(profile?.display_name || ''); setEditName(true); }}
+                    onClick={() => { setNameValue(effectiveProfileName); setEditName(true); }}
                     className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/40 hover:text-primary transition-colors"
                   >
                     Modify ID Tag

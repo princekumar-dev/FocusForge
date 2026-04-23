@@ -58,6 +58,16 @@ const DEFAULT_PROFILE: Omit<UserProfile, 'id' | 'user_id'> = {
   focus_minutes: 0,
 };
 
+function getPreferredNameFromClerk(clerkUser: NonNullable<ReturnType<typeof useUser>['user']>): string {
+  const email = clerkUser.primaryEmailAddress?.emailAddress ?? '';
+  const emailLocalPart = email.split('@')[0]?.trim() ?? '';
+  const fullName = clerkUser.fullName?.trim() ?? '';
+  const firstName = clerkUser.firstName?.trim() ?? '';
+  const username = clerkUser.username?.trim() ?? '';
+
+  return fullName || firstName || username || emailLocalPart || DEFAULT_PROFILE.display_name;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
   const { getToken } = useClerkAuth();
@@ -96,11 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: {
           ...DEFAULT_PROFILE,
           user_id: clerkUser.id,
-          display_name:
-            clerkUser.firstName ??
-            clerkUser.fullName ??
-            clerkUser.username ??
-            DEFAULT_PROFILE.display_name,
+          display_name: getPreferredNameFromClerk(clerkUser),
           created_at: new Date().toISOString(),
         },
       });
