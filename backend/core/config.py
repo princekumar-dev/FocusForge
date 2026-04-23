@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
+default_database_path = Path(__file__).parents[1] / "dev.db"
 
 # Load environment variables from workspace root `.env` so local runs pick them up
 # `parents[2]` moves up from backend/core -> backend -> workspace root
@@ -20,7 +21,9 @@ class Settings(BaseSettings):
     app_name: str = "FastAPI Modular Template"
     debug: bool = False
     version: str = "1.0.0"
-    database_url: str = ""
+    database_url: str = f"sqlite:///{default_database_path.as_posix()}"
+    mongodb_uri: str = ""
+    mongodb_db_name: str = "focusforge"
 
 
     # Server
