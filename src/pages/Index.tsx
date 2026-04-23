@@ -313,6 +313,55 @@ export default function DashboardPage() {
           </div>
         </Card>
 
+        <Card className="glass p-5 rounded-[2rem] border-white/20">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary/70">Feature Map</p>
+              <h3 className="text-lg font-black tracking-tight">Every new FocusForge feature</h3>
+            </div>
+            <Badge variant="secondary" className="glass border-white/10 text-[9px] uppercase font-black tracking-[0.22em]">
+              All live
+            </Badge>
+          </div>
+          <div className="space-y-2.5">
+            <button
+              onClick={() => navigate('/')}
+              className="w-full rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:border-white/25 hover:bg-white/10"
+            >
+              <p className="text-sm font-black tracking-tight">Focus Forecast</p>
+              <p className="text-[11px] font-semibold text-foreground/55 mt-1">On this dashboard, just above the stats row.</p>
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="w-full rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:border-white/25 hover:bg-white/10"
+            >
+              <p className="text-sm font-black tracking-tight">Daily Oracle</p>
+              <p className="text-[11px] font-semibold text-foreground/55 mt-1">On this dashboard, directly under Focus Forecast.</p>
+            </button>
+            <button
+              onClick={() => navigate('/focus')}
+              className="w-full rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:border-white/25 hover:bg-white/10"
+            >
+              <p className="text-sm font-black tracking-tight">Ritual Engine</p>
+              <p className="text-[11px] font-semibold text-foreground/55 mt-1">Open the focus page to see one-tap session builds.</p>
+            </button>
+            <button
+              onClick={() => navigate('/stats')}
+              className="w-full rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:border-white/25 hover:bg-white/10"
+            >
+              <p className="text-sm font-black tracking-tight">Signature Traits</p>
+              <p className="text-[11px] font-semibold text-foreground/55 mt-1">Open Hall of Fame to view your focus DNA bars.</p>
+            </button>
+            <button
+              onClick={() => navigate('/stats')}
+              className="w-full rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3 text-left transition-all hover:border-white/25 hover:bg-white/10"
+            >
+              <p className="text-sm font-black tracking-tight">Legend Badges</p>
+              <p className="text-[11px] font-semibold text-foreground/55 mt-1">Open Hall of Fame to see unlocked and locked badges.</p>
+            </button>
+          </div>
+        </Card>
+
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-4">
           <Card className="glass p-4 text-center rounded-[2rem] border-white/20 transition-transform hover:scale-[1.02]">
@@ -460,7 +509,7 @@ export default function DashboardPage() {
             <div className="p-3 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
               <Target className="w-6 h-6 text-primary" />
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest">Focus Mode</span>
+            <span className="text-xs font-bold uppercase tracking-widest">Ritual Engine</span>
           </Button>
           <Button
             variant="outline"
@@ -470,7 +519,7 @@ export default function DashboardPage() {
             <div className="p-3 rounded-2xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
               <Trophy className="w-6 h-6 text-blue-500" />
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest">View Stats</span>
+            <span className="text-xs font-bold uppercase tracking-widest">Traits & Badges</span>
           </Button>
         </div>
       </div>

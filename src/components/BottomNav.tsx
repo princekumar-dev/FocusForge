@@ -6,8 +6,8 @@ import { useAvatarSound } from '@/hooks/useAvatarSound';
 const NAV_ITEMS = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/tasks', icon: ListTodo, label: 'Tasks' },
-  { path: '/focus', icon: Target, label: 'Focus' },
-  { path: '/stats', icon: BarChart3, label: 'Stats' },
+  { path: '/focus', icon: Target, label: 'Rituals' },
+  { path: '/stats', icon: BarChart3, label: 'Legends' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
