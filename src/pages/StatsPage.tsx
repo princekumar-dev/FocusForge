@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
 import { getProfileExperience } from '@/lib/profileExperience';
+import { buildLegendBadges, buildSignatureTraits } from '@/lib/focusForgeInsights';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +53,8 @@ export default function StatsPage() {
   const tasksCompleted = profile?.tasks_completed || 0;
   const focusMinutes = profile?.focus_minutes || 0;
   const treeStage = Math.min(4, Math.max(1, profile?.tree_stage || 1));
+  const signatureTraits = buildSignatureTraits(profile, recentCompleted);
+  const legendBadges = buildLegendBadges(profile, recentCompleted);
 
   // Generate last 7 days for streak calendar
   const last7Days = useMemo(() => {
@@ -167,6 +170,65 @@ export default function StatsPage() {
             <p className="text-[10px] font-black text-foreground/30 mt-1 uppercase tracking-widest">Avg XP / Day</p>
           </Card>
         </div>
+
+        <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6">
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Signature Traits</p>
+              <h3 className="text-lg font-black tracking-tight">Your focus DNA</h3>
+            </div>
+            <Badge variant="secondary" className="glass border-white/10 text-[9px] uppercase font-black tracking-[0.22em]">
+              Unique profile
+            </Badge>
+          </div>
+          <div className="space-y-4">
+            {signatureTraits.map((trait) => (
+              <div key={trait.id} className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black tracking-tight">{trait.label}</p>
+                    <p className="text-[11px] font-semibold text-foreground/50">{trait.note}</p>
+                  </div>
+                  <span className="text-lg font-black tracking-tighter">{trait.value}</span>
+                </div>
+                <div className="h-3 rounded-full bg-white/10 border border-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-700"
+                    style={{ width: `${trait.value}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6 relative overflow-hidden">
+          <div className="absolute -right-6 -top-6 opacity-[0.06]">
+            <Trophy className="w-36 h-36 rotate-12" />
+          </div>
+          <div className="relative z-10">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70 mb-1.5">Legend Badges</p>
+            <h3 className="text-lg font-black tracking-tight mb-4">Proof this account has a personality</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {legendBadges.map((badge) => (
+                <div
+                  key={badge.id}
+                  className={`rounded-[1.5rem] border p-4 transition-all ${
+                    badge.unlocked
+                      ? 'bg-primary/10 border-primary/30 shadow-lg shadow-primary/10'
+                      : 'bg-white/5 border-white/10 opacity-60 grayscale'
+                  }`}
+                >
+                  <p className="text-sm font-black tracking-tight">{badge.label}</p>
+                  <p className="text-[11px] font-semibold text-foreground/55 mt-1 leading-relaxed">{badge.note}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] mt-3 text-foreground/40">
+                    {badge.unlocked ? 'Unlocked' : 'Locked'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
 
         {/* Streak Calendar */}
         <Card className="glass p-6 rounded-[2rem] border-white/20 mb-6">

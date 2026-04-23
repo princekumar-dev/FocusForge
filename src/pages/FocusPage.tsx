@@ -5,6 +5,7 @@ import { useAmbientSound, type AmbientPreset } from '@/hooks/useAmbientSound';
 import { useAvatarSound } from '@/hooks/useAvatarSound';
 
 import { getAmbientPresetLabel, getProfileExperience } from '@/lib/profileExperience';
+import { buildFocusRituals } from '@/lib/focusForgeInsights';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -137,6 +138,23 @@ export default function FocusPage() {
   const strokeDashoffset = (progress / 100) * circumference;
 
   const currentTask = tasks.find(t => String(t.id) === selectedTask);
+  const rituals = buildFocusRituals(profile, tasks);
+
+  const applyRitual = (ritualId: string) => {
+    const ritual = rituals.find((entry) => entry.id === ritualId);
+    if (!ritual) return;
+
+    playAvatarSound(profile?.avatar || 'ðŸŒ±');
+    setRunning(false);
+    setBreak(false);
+    setDuration(ritual.duration);
+    setLeft(ritual.duration * 60);
+    setAmbientPreset(ritual.ambient);
+    if (ritual.taskId) {
+      setSelectedTask(String(ritual.taskId));
+    }
+    toast.success(`${ritual.name} armed`);
+  };
 
   if (!user) {
     return (
@@ -307,6 +325,53 @@ export default function FocusPage() {
                 ? `${getAmbientPresetLabel(ambientPreset)} is active while work is in progress.`
                 : `Toggle on for dynamic ${getAmbientPresetLabel(ambientPreset).toLowerCase()} generated audio.`}
             </p>
+          </Card>
+
+          <Card className="glass p-5 rounded-[2rem] border-white/20 transition-all hover:border-white/30">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Ritual Engine</p>
+                <h3 className="text-lg font-black tracking-tight">One-tap session builds</h3>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-primary/10">
+                <Target className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+            <div className="space-y-3">
+              {rituals.map((ritual) => (
+                <button
+                  key={ritual.id}
+                  onClick={() => applyRitual(ritual.id)}
+                  className="w-full text-left rounded-[1.5rem] border border-white/10 bg-white/5 p-4 transition-all hover:border-white/25 hover:bg-white/10"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <p className="text-base font-black tracking-tight">{ritual.name}</p>
+                        <Badge variant="secondary" className="glass border-white/10 text-[9px] uppercase font-black tracking-[0.22em]">
+                          {ritual.tag}
+                        </Badge>
+                      </div>
+                      <p className="text-sm font-semibold text-foreground/70 leading-relaxed">{ritual.description}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-2xl font-black tracking-tighter">{ritual.duration}</p>
+                      <p className="text-[10px] uppercase font-black tracking-[0.22em] text-foreground/40">mins</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-3">
+                    <Badge variant="outline" className="glass border-white/10 text-[9px] uppercase font-black tracking-[0.22em]">
+                      {getAmbientPresetLabel(ritual.ambient)}
+                    </Badge>
+                    {ritual.taskLabel && (
+                      <Badge variant="outline" className="glass border-white/10 text-[9px] uppercase font-black tracking-[0.22em]">
+                        {ritual.taskLabel}
+                      </Badge>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
           </Card>
 
           <div className="grid grid-cols-2 gap-4">

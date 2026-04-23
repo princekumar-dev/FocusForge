@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { client } from '@/lib/api';
 import { getProfileExperience } from '@/lib/profileExperience';
+import { buildDailyOracle, buildFocusForecast } from '@/lib/focusForgeInsights';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import BottomNav from '@/components/BottomNav';
@@ -50,6 +50,14 @@ function getGreeting() {
   if (hour < 12) return 'morning';
   if (hour < 17) return 'afternoon';
   return 'evening';
+}
+
+function getOracleClasses(tone: string) {
+  if (tone === 'emerald') return 'from-emerald-500/20 via-emerald-400/10 to-transparent border-emerald-400/20';
+  if (tone === 'sky') return 'from-sky-500/20 via-sky-400/10 to-transparent border-sky-400/20';
+  if (tone === 'amber') return 'from-amber-500/20 via-amber-400/10 to-transparent border-amber-400/20';
+  if (tone === 'violet') return 'from-fuchsia-500/20 via-fuchsia-400/10 to-transparent border-fuchsia-400/20';
+  return 'from-primary/20 via-primary/10 to-transparent border-primary/20';
 }
 
 export default function DashboardPage() {
@@ -169,6 +177,8 @@ export default function DashboardPage() {
 
   const todayTasks = tasks.slice(0, 5);
   const pendingCount = tasks.length;
+  const forecast = buildFocusForecast(profile, tasks);
+  const oracle = buildDailyOracle(profile, tasks, user?.id);
 
   return (
     <div className="min-h-[100dvh] pb-safe">
@@ -237,6 +247,63 @@ export default function DashboardPage() {
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/profile')} className="rounded-xl border-white/20 hover:bg-white/10 transition-all font-bold text-[10px] uppercase tracking-wider">
               Tune vibe
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="glass p-5 rounded-[2rem] border-white/20 overflow-hidden relative">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_45%)] pointer-events-none" />
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary/70">Focus Forecast</p>
+                <h3 className="text-xl font-black tracking-tight">{forecast.windowLabel}</h3>
+              </div>
+              <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+            <p className="text-sm font-bold text-foreground/80 leading-relaxed">{forecast.headline}</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-[1.4rem] bg-white/5 border border-white/10 p-3.5">
+                <p className="text-[10px] uppercase font-black tracking-[0.24em] text-foreground/40">Momentum</p>
+                <p className="text-3xl font-black tracking-tighter mt-1">{forecast.momentum}</p>
+              </div>
+              <div className="rounded-[1.4rem] bg-white/5 border border-white/10 p-3.5">
+                <p className="text-[10px] uppercase font-black tracking-[0.24em] text-foreground/40">Pressure</p>
+                <p className="text-3xl font-black tracking-tighter mt-1">{forecast.overload}</p>
+              </div>
+            </div>
+            <p className="text-[11px] font-semibold text-foreground/55">{forecast.sparkLabel}</p>
+          </div>
+        </Card>
+
+        <Card className={`glass p-5 rounded-[2rem] relative overflow-hidden bg-gradient-to-br ${getOracleClasses(oracle.tone)}`}>
+          <div className="absolute -right-4 -top-4 opacity-10">
+            <Trophy className="w-28 h-28 rotate-12" />
+          </div>
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-foreground/55">Daily Oracle</p>
+                <h3 className="text-2xl font-black tracking-tight">{oracle.title}</h3>
+                <p className="text-sm font-bold text-foreground/75 leading-relaxed">{oracle.subtitle}</p>
+              </div>
+              <Badge variant="secondary" className="glass border-white/15 uppercase text-[9px] font-black tracking-[0.24em]">
+                {oracle.reward}
+              </Badge>
+            </div>
+            <p className="text-sm font-black leading-relaxed">{oracle.mantra}</p>
+            <div className="rounded-[1.4rem] bg-black/5 border border-white/10 px-4 py-3">
+              <p className="text-[10px] uppercase font-black tracking-[0.24em] text-foreground/40">Target Lock</p>
+              <p className="text-sm font-semibold text-foreground/75 mt-1">{oracle.targetHint}</p>
+            </div>
+            <Button
+              variant="outline"
+              className="rounded-2xl border-white/20 bg-white/10 hover:bg-white/15 font-black tracking-wide"
+              onClick={() => navigate(oracle.route)}
+            >
+              {oracle.cta}
             </Button>
           </div>
         </Card>
