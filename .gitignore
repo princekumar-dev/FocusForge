@@ -7,6 +7,8 @@ env/
 
 # Environment
 .env
+.env.*
+!.env.example
 
 # Node
 node_modules/
@@ -25,4 +27,11 @@ Thumbs.db
 
 # Logs
 logs/
-.log
+*.log
+
+# Build output
+dist/
+
+# Local databases
+*.db
+*.sqlite
